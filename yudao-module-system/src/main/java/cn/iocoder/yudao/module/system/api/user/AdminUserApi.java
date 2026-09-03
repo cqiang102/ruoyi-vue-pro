@@ -33,6 +33,15 @@ public interface AdminUserApi {
     AdminUserRespDTO getUserByMobile(String mobile);
 
     /**
+     * 校验后台用户账号密码（门店店员首次在小程序自助绑定微信时使用）
+     *
+     * @param username 账号
+     * @param password 密码（明文）
+     * @return 用户对象信息
+     */
+    AdminUserRespDTO verifyPassword(String username, String password);
+
+    /**
      * 通过用户 ID 查询用户下属
      *
      * @param id 用户编号

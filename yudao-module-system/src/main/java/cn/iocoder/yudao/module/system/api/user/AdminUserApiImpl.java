@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.service.auth.AdminAuthService;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ public class AdminUserApiImpl implements AdminUserApi {
     private AdminUserService userService;
     @Resource
     private DeptService deptService;
+    @Resource
+    private AdminAuthService adminAuthService;
 
     @Override
     @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致无法查询用户。类似：https://github.com/YunaiV/ruoyi-vue-pro/issues/1051
@@ -91,6 +94,12 @@ public class AdminUserApiImpl implements AdminUserApi {
     public List<AdminUserRespDTO> getUserListByNickname(String nickname) {
         List<AdminUserDO> users = userService.getUserListByNickname(nickname);
         return BeanUtils.toBean(users, AdminUserRespDTO.class);
+    }
+
+    @Override
+    public AdminUserRespDTO verifyPassword(String username, String password) {
+        AdminUserDO user = adminAuthService.authenticate(username, password);
+        return BeanUtils.toBean(user, AdminUserRespDTO.class);
     }
 
     @Override
