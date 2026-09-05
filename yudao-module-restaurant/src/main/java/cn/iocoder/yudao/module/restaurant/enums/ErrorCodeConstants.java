@@ -61,9 +61,11 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_REFUND_CALLBACK_INVALID = new ErrorCode(2_000_006_024, "退款回调校验失败：退款单不存在或未退款成功");
     ErrorCode ORDER_REFUND_ORDER_MISMATCH = new ErrorCode(2_000_006_025, "回调退款单号与订单不匹配");
 
-    // ========== 会员储值充值 2-000-007-xxx ==========
-    ErrorCode MEMBER_RECHARGE_AMOUNT_INVALID = new ErrorCode(2_000_007_001, "充值金额非法");
-    ErrorCode MEMBER_RECHARGE_NOT_FOUND = new ErrorCode(2_000_007_002, "充值单不存在");
+    // ========== 会员储值充值 2-000-010-xxx ==========
+    // 注意：本段原先误占 2-000-007-001 / 2-000-007-002，与下方「会员档案」段重复，
+    //      已迁移至独立的 2-000-010 段。全库均为常量名引用（无数字硬编码），改动安全。
+    ErrorCode MEMBER_RECHARGE_AMOUNT_INVALID = new ErrorCode(2_000_010_001, "充值金额非法");
+    ErrorCode MEMBER_RECHARGE_NOT_FOUND = new ErrorCode(2_000_010_002, "充值单不存在");
 
     // ========== 会员档案 2-000-007-000 ==========
     ErrorCode MEMBER_NOT_EXISTS = new ErrorCode(2_000_007_000, "会员不存在");
@@ -89,5 +91,8 @@ public interface ErrorCodeConstants {
     ErrorCode SUBSCRIPTION_NOT_ACTIVE = new ErrorCode(2_000_009_003, "当前租户无有效订阅，无法开通");
     ErrorCode PACKAGE_STATUS_INVALID = new ErrorCode(2_000_009_004, "套餐已停用，不可订阅");
     ErrorCode PACKAGE_IN_USE = new ErrorCode(2_000_009_005, "该套餐已被租户订阅，不可删除；请先停用");
+
+    // ========== 轮播图 2-000-011-000 ==========
+    ErrorCode BANNER_NOT_EXISTS = new ErrorCode(2_000_011_000, "轮播图不存在");
 
 }
