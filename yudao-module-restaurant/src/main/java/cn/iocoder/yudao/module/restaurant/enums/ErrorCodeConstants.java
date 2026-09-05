@@ -95,4 +95,9 @@ public interface ErrorCodeConstants {
     // ========== 轮播图 2-000-011-000 ==========
     ErrorCode BANNER_NOT_EXISTS = new ErrorCode(2_000_011_000, "轮播图不存在");
 
+    // ========== 会员收货地址 2-000-012-000（M-23） ==========
+    ErrorCode MEMBER_ADDRESS_NOT_EXISTS = new ErrorCode(2_000_012_000, "收货地址不存在");
+    ErrorCode MEMBER_ADDRESS_NOT_OWNER = new ErrorCode(2_000_012_001, "无权操作该收货地址");
+    ErrorCode MEMBER_ADDRESS_COUNT_LIMIT = new ErrorCode(2_000_012_002, "地址数量已达上限（20 条），请先删除不用的地址");
+
 }
