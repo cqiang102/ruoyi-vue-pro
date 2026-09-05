@@ -100,4 +100,10 @@ public interface ErrorCodeConstants {
     ErrorCode MEMBER_ADDRESS_NOT_OWNER = new ErrorCode(2_000_012_001, "无权操作该收货地址");
     ErrorCode MEMBER_ADDRESS_COUNT_LIMIT = new ErrorCode(2_000_012_002, "地址数量已达上限（20 条），请先删除不用的地址");
 
+    // ========== 会员卡 2-000-013-000（M-26） ==========
+    ErrorCode MEMBER_CARD_NOT_EXISTS = new ErrorCode(2_000_013_000, "会员卡不存在");
+    ErrorCode MEMBER_CARD_NOT_ON_SALE = new ErrorCode(2_000_013_001, "会员卡已下架或价格异常，无法购买");
+    ErrorCode MEMBER_CARD_BUY_CONFLICT = new ErrorCode(2_000_013_002, "购卡高峰，请重试");
+    ErrorCode MEMBER_CARD_ORDER_NOT_EXISTS = new ErrorCode(2_000_013_003, "购卡记录不存在");
+
 }
