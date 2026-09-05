@@ -123,6 +123,16 @@ public class AdminOrderController {
         return success(orderService.getOrderPage(pageReqVO));
     }
 
+    @PutMapping("/pay-cash")
+    @Operation(summary = "现金收讫（收银台 M-04：待支付 → 已支付，无支付单）")
+    @PreAuthorize("hasAnyAuthority('restaurant:order:pay-cash')")
+    public CommonResult<Boolean> payOrderByCash(@RequestParam("id") Long id) {
+        // P1-A：校验订单归属——门店端只能给本店订单收银，杜绝跨店收款
+        storeAuthService.validateOrderOwnership(id);
+        orderService.payByCash(id);
+        return success(true);
+    }
+
     @PutMapping("/refund")
     @Operation(summary = "退款（门店/商家发起，原路退回）")
     @PreAuthorize("hasAnyAuthority('restaurant:order:refund')")

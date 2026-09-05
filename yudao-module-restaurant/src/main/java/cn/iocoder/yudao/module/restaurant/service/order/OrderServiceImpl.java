@@ -391,6 +391,28 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    /**
+     * 收银台 M-04：现金收讫。与 payByBalance 同款 CAS 幂等，仅状态流转不涉资金。
+     */
+    @Override
+    public void payByCash(Long orderId) {
+        OrderDO order = validateOrderExists(orderId);
+        if (!OrderStatusEnum.UNPAID.getStatus().equals(order.getStatus())) {
+            throw new ServiceException(ErrorCodeConstants.ORDER_NOT_UNPAID);
+        }
+        // CAS 条件更新：仅当订单仍为待支付时生效，并发重复收银只成功一次
+        int rows = orderMapper.update(null, new LambdaUpdateWrapper<OrderDO>()
+                .eq(OrderDO::getId, orderId)
+                .eq(OrderDO::getStatus, OrderStatusEnum.UNPAID.getStatus())
+                .set(OrderDO::getStatus, OrderStatusEnum.PAID.getStatus())
+                .set(OrderDO::getPayStatus, 1)
+                .set(OrderDO::getPayType, 4)
+                .set(OrderDO::getPaidTime, LocalDateTime.now()));
+        if (rows == 0) {
+            throw new ServiceException(ErrorCodeConstants.ORDER_NOT_UNPAID);
+        }
+    }
+
     @Override
     public void refundOrder(Long orderId, String reason) {
         // P1-D：去掉方法级 @Transactional。原实现在 @Transactional 内调用 orderPayService.createRefund

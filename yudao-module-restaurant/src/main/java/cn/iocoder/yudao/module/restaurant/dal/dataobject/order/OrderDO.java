@@ -73,7 +73,7 @@ public class OrderDO extends TenantBaseDO {
      */
     private String receiverAddress;
     /**
-     * 支付方式：0未付 1微信 2余额 3组合
+     * 支付方式：0未付 1微信 2余额 3组合 4现金（收银台 M-04）
      */
     private Integer payType;
     /**

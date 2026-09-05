@@ -69,6 +69,17 @@ public interface OrderService {
     void payByBalance(Long orderId, Long userId);
 
     /**
+     * 现金收讫（收银台 M-04：店员现场收现金，订单待支付 → 已支付）
+     * <p>
+     * 不走 pay 模块、无支付单；仅校验订单为待支付态（订单归属本店由调用方
+     * 通过 {@code StoreAuthService#validateOrderOwnership} 校验，与 P1-A 模式一致）。
+     * 支付方式记为现金（payType=4），无账务流水，退款走 refundOrder 时按现金原路人工退还（MVP 边界）。
+     *
+     * @param orderId 订单编号
+     */
+    void payByCash(Long orderId);
+
+    /**
      * 发起退款
      * <p>
      * 微信支付的订单走芋道 Pay 退款（原路退回，异步回调 {@link #onRefundSuccess} 置为已退款）；
