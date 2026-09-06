@@ -369,5 +369,11 @@ yudao:
     yly: # 易联云云打印（M-10，自有型应用；client-id/secret 在 https://dev.10ss.net 应用详情获取）
       client-id:
       client-secret:
+    dada: # 达达快送（M-11；app-key/secret/source-id 在 https://new.imdada.cn 开放平台获取；联调时 base-url 改 https://newopen.qa.imdada.cn）
+      app-key:
+      app-secret:
+      source-id:
+      base-url: https://newopen.imdada.cn
+      callback-url: # 配送状态回调 URL（公网可达，如 https://api.xxx.com/admin-api/restaurant/delivery/notify）
 
 debug: false

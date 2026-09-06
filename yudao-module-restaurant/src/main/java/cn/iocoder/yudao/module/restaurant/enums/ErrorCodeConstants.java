@@ -111,4 +111,13 @@ public interface ErrorCodeConstants {
     ErrorCode PRINT_TASK_NOT_EXISTS = new ErrorCode(2_000_014_001, "打印任务不存在");
     ErrorCode PRINTER_MACHINE_CODE_DUPLICATE = new ErrorCode(2_000_014_002, "该终端号已绑定其他打印机");
 
+    // ========== 达达配送 2-000-015-000（M-11） ==========
+    ErrorCode DELIVERY_CONFIG_NOT_EXISTS = new ErrorCode(2_000_015_000, "门店配送配置不存在，请先完成达达门店配置");
+    ErrorCode DELIVERY_CONFIG_DISABLED = new ErrorCode(2_000_015_001, "门店未启用达达配送");
+    ErrorCode DELIVERY_ORDER_EXISTS = new ErrorCode(2_000_015_002, "该订单已有进行中的运单");
+    ErrorCode DELIVERY_ORDER_NOT_EXISTS = new ErrorCode(2_000_015_003, "运单不存在");
+    ErrorCode DELIVERY_ORDER_STATUS_INVALID = new ErrorCode(2_000_015_004, "当前运单状态不允许该操作");
+    ErrorCode DELIVERY_CALLBACK_SIGN_INVALID = new ErrorCode(2_000_015_005, "配送回调签名校验失败");
+    ErrorCode DELIVERY_ORDER_NOT_DELIVERY = new ErrorCode(2_000_015_006, "仅外卖订单可发配送");
+
 }
