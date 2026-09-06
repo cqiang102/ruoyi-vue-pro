@@ -106,4 +106,9 @@ public interface ErrorCodeConstants {
     ErrorCode MEMBER_CARD_BUY_CONFLICT = new ErrorCode(2_000_013_002, "购卡高峰，请重试");
     ErrorCode MEMBER_CARD_ORDER_NOT_EXISTS = new ErrorCode(2_000_013_003, "购卡记录不存在");
 
+    // ========== 云打印机 2-000-014-000（M-10） ==========
+    ErrorCode PRINTER_NOT_EXISTS = new ErrorCode(2_000_014_000, "打印机不存在");
+    ErrorCode PRINT_TASK_NOT_EXISTS = new ErrorCode(2_000_014_001, "打印任务不存在");
+    ErrorCode PRINTER_MACHINE_CODE_DUPLICATE = new ErrorCode(2_000_014_002, "该终端号已绑定其他打印机");
+
 }

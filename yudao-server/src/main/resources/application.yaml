@@ -365,5 +365,9 @@ yudao:
   iot:
     message-bus:
       type: redis # 消息总线的类型
+  restaurant: # 餐饮 SaaS 配置项
+    yly: # 易联云云打印（M-10，自有型应用；client-id/secret 在 https://dev.10ss.net 应用详情获取）
+      client-id:
+      client-secret:
 
 debug: false

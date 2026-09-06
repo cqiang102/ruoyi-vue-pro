@@ -113,6 +113,8 @@ public class OrderServiceImpl implements OrderService {
     private CouponTemplateMapper couponTemplateMapper;
     @Resource
     private PlatformTransactionManager transactionManager;
+    @Resource
+    private cn.iocoder.yudao.module.restaurant.service.print.PrintService printService;
 
     /**
      * 编程式事务模板——用于「方法整体无需事务、但其中某段子流程需要原子性」的场景
@@ -275,6 +277,8 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setStatus(OrderStatusEnum.COOKING.getStatus());
         orderMapper.updateById(order);
+        // M-10：接单成功触发云打印（旁路功能，内部全量 try-catch，失败不影响接单）
+        printService.printOrder(orderId);
     }
 
     @Override
