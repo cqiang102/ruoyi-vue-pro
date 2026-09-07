@@ -95,6 +95,9 @@ public class OrderVO {
         @Schema(description = "备注", example = "不要香菜")
         private String remark;
 
+        @Schema(description = "预约到店时间（type=4 预约单必填，不得早于当前时间）", example = "2026-09-08T12:00:00")
+        private LocalDateTime reserveTime;
+
         @Schema(description = "收货人姓名（外卖必填）", example = "张三")
         private String receiverName;
 

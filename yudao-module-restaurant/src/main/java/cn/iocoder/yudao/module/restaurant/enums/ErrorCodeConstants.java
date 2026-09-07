@@ -133,4 +133,7 @@ public interface ErrorCodeConstants {
     ErrorCode POINT_ORDER_NOT_OWNER = new ErrorCode(2_000_017_005, "仅能操作本人的兑换记录");
     ErrorCode POINT_PRODUCT_DELETE_FORBIDDEN = new ErrorCode(2_000_017_006, "请先下架再删除积分商品");
 
+    // ========== 预约订单 2-000-018-000（M-17） ==========
+    ErrorCode ORDER_RESERVE_TIME_INVALID = new ErrorCode(2_000_018_000, "预约时间不能为空且不得早于当前时间");
+
 }

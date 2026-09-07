@@ -157,6 +157,13 @@ public class OrderServiceImpl implements OrderService {
             }
             deliveryFee = store.getDeliveryFee() == null ? 0L : store.getDeliveryFee();
         }
+        // 预约单（M-17）：必须带预约时间，且不得早于当前（避免下「过去」的预约单）
+        if (OrderTypeEnum.RESERVED.getType().equals(createReqVO.getType())) {
+            if (createReqVO.getReserveTime() == null
+                    || createReqVO.getReserveTime().isBefore(LocalDateTime.now())) {
+                throw new ServiceException(ErrorCodeConstants.ORDER_RESERVE_TIME_INVALID);
+            }
+        }
         List<OrderItemDO> items = buildItems(0L, createReqVO.getItems());
         long goodsTotal = sumTotal(items);
         // 外卖起送价校验（按商品金额，不含配送费）
@@ -192,6 +199,7 @@ public class OrderServiceImpl implements OrderService {
                 .setCouponId(createReqVO.getCouponId())
                 .setPeopleCount(createReqVO.getPeopleCount())
                 .setRemark(createReqVO.getRemark())
+                .setReserveTime(createReqVO.getReserveTime())
                 .setDeliveryFee(deliveryFee)
                 .setReceiverName(createReqVO.getReceiverName())
                 .setReceiverPhone(createReqVO.getReceiverPhone())

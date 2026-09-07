@@ -14,7 +14,8 @@ public enum OrderTypeEnum {
 
     DINE_IN(1, "堂食"),
     TAKE_OUT(2, "自取"),
-    DELIVERY(3, "外卖");
+    DELIVERY(3, "外卖"),
+    RESERVED(4, "预约");
 
     private final Integer type;
     private final String desc;

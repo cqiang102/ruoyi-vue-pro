@@ -103,6 +103,11 @@ public class OrderDO extends TenantBaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 预约到店时间（type=4 预约单必填）
+     */
+    private LocalDateTime reserveTime;
     /**
      * 关联的 pay_order.id（微信支付单）
      */
