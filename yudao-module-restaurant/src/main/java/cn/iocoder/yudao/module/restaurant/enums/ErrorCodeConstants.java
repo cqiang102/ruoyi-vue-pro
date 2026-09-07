@@ -124,4 +124,13 @@ public interface ErrorCodeConstants {
     ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(2_000_016_000, "订阅消息模板不存在");
     ErrorCode NOTIFY_TEMPLATE_SCENE_DUPLICATE = new ErrorCode(2_000_016_001, "该场景已配置模板，请勿重复添加");
 
+    // ========== 积分商城 2-000-017-000（M-27） ==========
+    ErrorCode POINT_PRODUCT_NOT_EXISTS = new ErrorCode(2_000_017_000, "积分商品不存在");
+    ErrorCode POINT_PRODUCT_OFF_SHELF = new ErrorCode(2_000_017_001, "积分商品已下架");
+    ErrorCode POINT_PRODUCT_STOCK_NOT_ENOUGH = new ErrorCode(2_000_017_002, "积分商品库存不足");
+    ErrorCode POINT_ORDER_NOT_EXISTS = new ErrorCode(2_000_017_003, "兑换记录不存在");
+    ErrorCode POINT_ORDER_STATUS_INVALID = new ErrorCode(2_000_017_004, "当前兑换状态不允许该操作");
+    ErrorCode POINT_ORDER_NOT_OWNER = new ErrorCode(2_000_017_005, "仅能操作本人的兑换记录");
+    ErrorCode POINT_PRODUCT_DELETE_FORBIDDEN = new ErrorCode(2_000_017_006, "请先下架再删除积分商品");
+
 }
