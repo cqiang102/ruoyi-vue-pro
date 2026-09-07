@@ -115,6 +115,12 @@ public class OrderServiceImpl implements OrderService {
     private PlatformTransactionManager transactionManager;
     @Resource
     private cn.iocoder.yudao.module.restaurant.service.print.PrintService printService;
+    /**
+     * 微信订阅消息（M-12）：支付成功 / 出餐完成 / 退款成功 三时机推送；
+     * 内部吞异常，绝不影响下单主流程
+     */
+    @Resource
+    private cn.iocoder.yudao.module.restaurant.service.notify.NotifyService notifyService;
 
     /**
      * 编程式事务模板——用于「方法整体无需事务、但其中某段子流程需要原子性」的场景
@@ -540,6 +546,9 @@ public class OrderServiceImpl implements OrderService {
                 .setPayOrderId(payOrderId)
                 .setPaidTime(LocalDateTime.now());
         TenantUtils.execute(order.getTenantId(), () -> orderMapper.updateById(order));
+        // M-12：微信订阅消息（支付成功）——旁路发送，失败仅落库不阻断支付回调
+        sendNotify(order, cn.iocoder.yudao.module.restaurant.service.notify.NotifyService.SCENE_PAY_SUCCESS,
+                fen2YuanStr(order.getPayPrice()));
     }
 
     @Override
@@ -578,6 +587,9 @@ public class OrderServiceImpl implements OrderService {
             // P1-6/P1-7：微信退款落地，逆向回滚（归还优惠券 + 冲正已完成订单的消费积分）
             rollbackOrderBenefits(order);
         });
+        // M-12：微信订阅消息（退款成功）
+        sendNotify(order, cn.iocoder.yudao.module.restaurant.service.notify.NotifyService.SCENE_REFUND_SUCCESS,
+                fen2YuanStr(refundAmount));
     }
 
     @Override
@@ -821,6 +833,34 @@ public class OrderServiceImpl implements OrderService {
         // 消费升级：订单完成后给会员累加成长值 / 积分 / 累计消费（散客忽略）
         Long payPrice = order.getPayPrice() != null ? order.getPayPrice() : order.getTotalPrice();
         memberService.addConsume(order.getMemberId(), payPrice);
+        // M-12：微信订阅消息（出餐/取餐完成）
+        sendNotify(order, cn.iocoder.yudao.module.restaurant.service.notify.NotifyService.SCENE_MEAL_READY, null);
+    }
+
+    /**
+     * 触发订阅消息（M-12）：散客单（无 userId）直接跳过；始终在订单所属租户上下文中发送。
+     * 模板字段约定：character_string1=订单号，amount3=金额(元)，time4=时间。
+     */
+    private void sendNotify(OrderDO order, String scene, String amount) {
+        if (order.getUserId() == null) {
+            return;
+        }
+        Map<String, String> messages = new java.util.LinkedHashMap<>();
+        messages.put("character_string1", order.getOrderNo());
+        if (amount != null) {
+            messages.put("amount3", amount);
+        }
+        messages.put("time4", LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        TenantUtils.execute(order.getTenantId(), () -> notifyService.send(
+                order.getUserId(), order.getStoreId(), scene, order.getId(), messages, null));
+    }
+
+    /**
+     * 分转元字符串（订阅消息 amount 字段要求形如 38.50）
+     */
+    private static String fen2YuanStr(Long fen) {
+        return fen == null ? null : String.format("%.2f", fen / 100.0);
     }
 
     private OrderDO validateOrderExists(Long id) {

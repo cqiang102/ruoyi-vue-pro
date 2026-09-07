@@ -120,4 +120,8 @@ public interface ErrorCodeConstants {
     ErrorCode DELIVERY_CALLBACK_SIGN_INVALID = new ErrorCode(2_000_015_005, "配送回调签名校验失败");
     ErrorCode DELIVERY_ORDER_NOT_DELIVERY = new ErrorCode(2_000_015_006, "仅外卖订单可发配送");
 
+    // ========== 订阅消息 2-000-016-000（M-12） ==========
+    ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(2_000_016_000, "订阅消息模板不存在");
+    ErrorCode NOTIFY_TEMPLATE_SCENE_DUPLICATE = new ErrorCode(2_000_016_001, "该场景已配置模板，请勿重复添加");
+
 }
