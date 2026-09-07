@@ -40,4 +40,12 @@ public class MemberController {
                 }}).getList().stream().findFirst().orElse(null));
     }
 
+    @PutMapping("/update-tags")
+    @Operation(summary = "更新会员标签（M-22）")
+    @PreAuthorize("hasAnyAuthority('restaurant:member:update-tag')")
+    public CommonResult<Boolean> updateTags(@Validated @RequestBody MemberVO.TagUpdateReqVO reqVO) {
+        memberService.updateTags(reqVO);
+        return success(true);
+    }
+
 }

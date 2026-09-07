@@ -183,6 +183,16 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> imple
         throw new ServiceException(ErrorCodeConstants.MEMBER_POINT_CHANGE_FAILED);
     }
 
+    @Override
+    public void updateTags(MemberVO.TagUpdateReqVO reqVO) {
+        MemberDO member = getById(reqVO.getId());
+        if (member == null) {
+            throw new ServiceException(ErrorCodeConstants.MEMBER_NOT_EXISTS);
+        }
+        member.setTags(reqVO.getTags() == null ? "" : reqVO.getTags());
+        memberMapper().updateById(member);
+    }
+
     // ===================== 私有辅助 =====================
 
     private MemberVO.RespVO convertToResp(MemberDO member) {
@@ -197,6 +207,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> imple
         respVO.setGrowthValue(member.getGrowthValue());
         respVO.setPointBalance(member.getPointBalance());
         respVO.setTotalConsume(member.getTotalConsume());
+        respVO.setTags(member.getTags());
         respVO.setCreateTime(member.getCreateTime());
         respVO.setUpdateTime(member.getUpdateTime());
         return respVO;

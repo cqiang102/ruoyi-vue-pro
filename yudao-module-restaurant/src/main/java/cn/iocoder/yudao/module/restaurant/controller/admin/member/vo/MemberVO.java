@@ -51,8 +51,26 @@ public class MemberVO {
          * 累计消费（单位：分）
          */
         private Long totalConsume;
+        /**
+         * 会员标签（JSON 数组字符串，M-22）
+         */
+        private String tags;
         private LocalDateTime createTime;
         private LocalDateTime updateTime;
+    }
+
+    @Schema(description = "会员标签更新 Request VO")
+    @Data
+    public static class TagUpdateReqVO {
+        /**
+         * 会员档案编号（restaurant_member.id）
+         */
+        @javax.validation.constraints.NotNull(message = "会员编号不能为空")
+        private Long id;
+        /**
+         * 标签（JSON 数组字符串，空串 = 清空全部标签）
+         */
+        private String tags;
     }
 
 }

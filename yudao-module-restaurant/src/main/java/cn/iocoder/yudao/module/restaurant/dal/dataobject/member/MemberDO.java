@@ -43,6 +43,11 @@ public class MemberDO extends TenantBaseDO {
      * 累计消费金额（单位：分）
      */
     private Long totalConsume;
+
+    /**
+     * 会员标签（JSON 数组字符串，如 ["高频","企业客户"]，M-22）
+     */
+    private String tags;
     /**
      * 乐观锁版本号（CAS 并发控制，复用芋道 pay 余额方案）
      */

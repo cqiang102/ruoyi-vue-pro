@@ -59,4 +59,11 @@ public interface MemberService {
      */
     void adjustPoint(Long memberId, Integer delta);
 
+    /**
+     * 更新会员标签（M-22）
+     *
+     * @param reqVO 会员编号 + 标签（JSON 数组字符串，空串清空）
+     */
+    void updateTags(MemberVO.TagUpdateReqVO reqVO);
+
 }
