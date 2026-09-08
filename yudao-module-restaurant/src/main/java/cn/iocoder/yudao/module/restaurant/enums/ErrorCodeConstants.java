@@ -145,4 +145,10 @@ public interface ErrorCodeConstants {
     // ========== 2-000-021 帮助文档（C-12） ==========
     ErrorCode HELP_DOC_NOT_EXISTS = new ErrorCode(2_000_021_000, "帮助文档不存在");
 
+    // ========== 2-000-022 财务提现（M-30） ==========
+    ErrorCode WITHDRAW_ACCOUNT_NOT_EXISTS = new ErrorCode(2_000_022_000, "提现账户不存在或不属于该门店");
+    ErrorCode WITHDRAW_NOT_EXISTS = new ErrorCode(2_000_022_001, "提现单不存在");
+    ErrorCode WITHDRAW_STATUS_INVALID = new ErrorCode(2_000_022_002, "提现单状态不允许该操作");
+    ErrorCode WITHDRAW_AMOUNT_INVALID = new ErrorCode(2_000_022_003, "提现金额必须大于 0");
+
 }
