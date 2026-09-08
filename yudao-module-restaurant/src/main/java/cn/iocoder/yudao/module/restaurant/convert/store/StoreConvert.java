@@ -20,6 +20,8 @@ public class StoreConvert {
         respVO.setContact(bean.getContact());
         respVO.setPhone(bean.getPhone());
         respVO.setAddress(bean.getAddress());
+        respVO.setLatitude(bean.getLatitude());
+        respVO.setLongitude(bean.getLongitude());
         respVO.setBusinessStart(bean.getBusinessStart());
         respVO.setBusinessEnd(bean.getBusinessEnd());
         respVO.setStatus(bean.getStatus());

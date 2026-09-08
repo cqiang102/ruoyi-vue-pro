@@ -51,6 +51,12 @@ public class StoreVO {
         @Schema(description = "地址", example = "北京市朝阳区...")
         private String address;
 
+        @Schema(description = "纬度（C-14）", example = "39.908722")
+        private Double latitude;
+
+        @Schema(description = "经度（C-14）", example = "116.397499")
+        private Double longitude;
+
         @Schema(description = "营业开始（HH:mm）", example = "10:00")
         private String businessStart;
 
@@ -87,6 +93,15 @@ public class StoreVO {
 
         @Schema(description = "地址", example = "北京市朝阳区...")
         private String address;
+
+        @Schema(description = "纬度（C-14）", example = "39.908722")
+        private Double latitude;
+
+        @Schema(description = "经度（C-14）", example = "116.397499")
+        private Double longitude;
+
+        @Schema(description = "距离（公里，仅传入定位时返回）", example = "1.23")
+        private Double distanceKm;
 
         @Schema(description = "营业开始（HH:mm）", requiredMode = Schema.RequiredMode.REQUIRED, example = "10:00")
         private String businessStart;

@@ -38,6 +38,16 @@ public class StoreDO extends TenantBaseDO {
      * 地址
      */
     private String address;
+
+    /**
+     * 纬度（C-14 门店定位；高德/GCJ-02 坐标系，与微信 uni.getLocation 一致）
+     */
+    private Double latitude;
+
+    /**
+     * 经度（C-14）
+     */
+    private Double longitude;
     /**
      * 营业开始（HH:mm）
      */

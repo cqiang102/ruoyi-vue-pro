@@ -42,4 +42,9 @@ public interface StoreService {
      */
     List<StoreVO.RespVO> getStoreSimpleList();
 
+    /**
+     * 会员端门店列表（C-14）：传入定位时计算距离并按距离升序，未定位则按 id 升序
+     */
+    List<StoreVO.RespVO> getStoreListForMember(Double latitude, Double longitude);
+
 }

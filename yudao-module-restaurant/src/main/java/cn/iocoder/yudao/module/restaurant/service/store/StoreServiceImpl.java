@@ -87,6 +87,44 @@ public class StoreServiceImpl implements StoreService {
         return convertList(list, StoreConvert::convert);
     }
 
+    @Override
+    public List<StoreVO.RespVO> getStoreListForMember(Double latitude, Double longitude) {
+        List<StoreVO.RespVO> list = getStoreSimpleList();
+        boolean located = latitude != null && longitude != null
+                && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
+        if (located) {
+            for (StoreVO.RespVO vo : list) {
+                vo.setDistanceKm(distanceKm(latitude, longitude, vo.getLatitude(), vo.getLongitude()));
+            }
+            // 有坐标的按距离升序，无坐标的排最后
+            list.sort((a, b) -> {
+                Double da = a.getDistanceKm();
+                Double db = b.getDistanceKm();
+                if (da == null && db == null) return Long.compare(a.getId(), b.getId());
+                if (da == null) return 1;
+                if (db == null) return -1;
+                return Double.compare(da, db);
+            });
+        }
+        return list;
+    }
+
+    /**
+     * Haversine 球面距离（公里）；任一端缺坐标返回 null
+     */
+    private Double distanceKm(double lat1, double lng1, Double lat2, Double lng2) {
+        if (lat2 == null || lng2 == null) {
+            return null;
+        }
+        double r = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
     // ========== 辅助 ==========
 
     public StoreDO validateStoreExists(Long id) {

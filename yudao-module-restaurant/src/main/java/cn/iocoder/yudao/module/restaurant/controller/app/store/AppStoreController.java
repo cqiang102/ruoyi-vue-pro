@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -28,6 +29,14 @@ public class AppStoreController {
     @Operation(summary = "获得门店公开信息（含配送费/起送价，下单外卖用）")
     public CommonResult<StoreVO.RespVO> getStore(@RequestParam("id") Long id) {
         return success(storeService.getStore(id));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "门店列表（C-14：传入定位时按距离升序并返回距离公里数）")
+    public CommonResult<List<StoreVO.RespVO>> getStoreList(
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude) {
+        return success(storeService.getStoreListForMember(latitude, longitude));
     }
 
 }
