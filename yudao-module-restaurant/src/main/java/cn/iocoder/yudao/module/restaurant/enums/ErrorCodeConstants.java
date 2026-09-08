@@ -136,4 +136,7 @@ public interface ErrorCodeConstants {
     // ========== 预约订单 2-000-018-000（M-17） ==========
     ErrorCode ORDER_RESERVE_TIME_INVALID = new ErrorCode(2_000_018_000, "预约时间不能为空且不得早于当前时间");
 
+    // ========== 2-000-019 我的服务菜单（M-24） ==========
+    ErrorCode PORTAL_MENU_NOT_EXISTS = new ErrorCode(2_000_019_000, "服务菜单项不存在");
+
 }
