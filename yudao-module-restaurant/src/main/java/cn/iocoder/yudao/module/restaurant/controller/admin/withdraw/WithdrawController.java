@@ -45,6 +45,9 @@ public class WithdrawController {
     @Resource
     private StatisticsMapper statisticsMapper;
 
+    @Resource
+    private cn.iocoder.yudao.module.restaurant.service.store.StoreAuthService storeAuthService;
+
     // ===================== 提现账户 =====================
 
     @PostMapping("/account/create")
@@ -113,6 +116,14 @@ public class WithdrawController {
     @Operation(summary = "门店收支概览（累计收入/已提现/可提现）")
     @PreAuthorize("@ss.hasAnyPermissions('restaurant:withdraw:query')")
     public CommonResult<Map<String, Object>> getIncomeSummary(@RequestParam("storeId") Long storeId) {
+        return success(withdrawService.getIncomeSummary(storeId, statisticsMapper));
+    }
+
+    @GetMapping("/workbench-summary")
+    @Operation(summary = "工作台收支概览（S-04：storeId 由登录店员绑定门店强制注入）")
+    @PreAuthorize("@ss.hasAnyPermissions('restaurant:withdraw:query')")
+    public CommonResult<Map<String, Object>> getWorkbenchSummary() {
+        Long storeId = storeAuthService.getLoginUserStoreId();
         return success(withdrawService.getIncomeSummary(storeId, statisticsMapper));
     }
 
