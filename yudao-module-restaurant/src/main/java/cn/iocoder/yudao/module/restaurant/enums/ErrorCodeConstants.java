@@ -151,4 +151,7 @@ public interface ErrorCodeConstants {
     ErrorCode WITHDRAW_STATUS_INVALID = new ErrorCode(2_000_022_002, "提现单状态不允许该操作");
     ErrorCode WITHDRAW_AMOUNT_INVALID = new ErrorCode(2_000_022_003, "提现金额必须大于 0");
 
+    // ========== 2-000-023 公告（P-07） ==========
+    ErrorCode NOTICE_NOT_EXISTS = new ErrorCode(2_000_023_000, "公告不存在");
+
 }
