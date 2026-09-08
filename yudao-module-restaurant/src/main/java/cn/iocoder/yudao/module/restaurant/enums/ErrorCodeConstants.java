@@ -139,4 +139,7 @@ public interface ErrorCodeConstants {
     // ========== 2-000-019 我的服务菜单（M-24） ==========
     ErrorCode PORTAL_MENU_NOT_EXISTS = new ErrorCode(2_000_019_000, "服务菜单项不存在");
 
+    // ========== 2-000-020 预约规则（M-09） ==========
+    ErrorCode RESERVE_RULE_NOT_EXISTS = new ErrorCode(2_000_020_000, "预约规则不存在");
+
 }

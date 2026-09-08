@@ -97,4 +97,13 @@ public class ConsumerOrderController {
         return success(true);
     }
 
+    @PostMapping("/cancel")
+    @Operation(summary = "取消订单（消费者发起，C-15 预约取消）")
+    public CommonResult<Boolean> cancelOrder(@RequestParam("orderId") Long orderId) {
+        // 归属校验：只能取消自己的订单
+        orderService.validateOrderOwner(orderId, SecurityFrameworkUtils.getLoginUserId());
+        orderService.cancelOrder(orderId);
+        return success(true);
+    }
+
 }
