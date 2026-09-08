@@ -157,4 +157,16 @@ public interface ErrorCodeConstants {
     // ========== 2-000-024 首页装修（M-02） ==========
     ErrorCode HOME_DECOR_NOT_EXISTS = new ErrorCode(2_000_024_000, "装修条目不存在");
 
+    // ========== 2-000-025 资讯（M-10） ==========
+    ErrorCode NEWS_NOT_EXISTS = new ErrorCode(2_000_025_000, "资讯不存在");
+
+    // ========== 2-000-026 电子发票（M-35） ==========
+    ErrorCode INVOICE_NOT_EXISTS = new ErrorCode(2_000_026_000, "开票申请不存在");
+    ErrorCode INVOICE_TITLE_NOT_EXISTS = new ErrorCode(2_000_026_001, "发票抬头不存在");
+    ErrorCode INVOICE_ORDER_INVALID = new ErrorCode(2_000_026_002, "该订单不可开票（未支付/已取消/非本人）");
+    ErrorCode INVOICE_ALREADY_APPLIED = new ErrorCode(2_000_026_003, "该订单已申请过开票");
+    ErrorCode INVOICE_STATUS_INVALID = new ErrorCode(2_000_026_004, "开票申请状态不允许该操作");
+    ErrorCode INVOICE_TAX_NO_REQUIRED = new ErrorCode(2_000_026_005, "企业抬头必须填写税号");
+    ErrorCode INVOICE_REJECT_REASON_REQUIRED = new ErrorCode(2_000_026_006, "驳回时必须填写原因");
+
 }
