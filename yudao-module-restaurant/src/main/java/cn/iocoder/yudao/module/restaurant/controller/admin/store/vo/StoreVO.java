@@ -48,6 +48,9 @@ public class StoreVO {
         @Schema(description = "联系电话", example = "13800138000")
         private String phone;
 
+        @Schema(description = "客服微信号（C-12）", example = "restaurant_cs")
+        private String serviceWechat;
+
         @Schema(description = "地址", example = "北京市朝阳区...")
         private String address;
 
@@ -90,6 +93,9 @@ public class StoreVO {
 
         @Schema(description = "联系电话", example = "13800138000")
         private String phone;
+
+        @Schema(description = "客服微信号（C-12）", example = "restaurant_cs")
+        private String serviceWechat;
 
         @Schema(description = "地址", example = "北京市朝阳区...")
         private String address;

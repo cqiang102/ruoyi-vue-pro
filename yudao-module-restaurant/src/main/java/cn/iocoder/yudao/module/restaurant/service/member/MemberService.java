@@ -12,6 +12,13 @@ import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberDO;
 public interface MemberService {
 
     /**
+     * 历史消费汇总（C-12 用户中心）：累计消费金额（分）、订单数、最近下单时间
+     *
+     * @param userId 用户编号
+     */
+    MemberConsumeSummaryVO getConsumeSummary(Long userId);
+
+    /**
      * 获取或创建会员档案（按 userId 单租户唯一）
      */
     MemberDO getOrCreateMember(Long userId);

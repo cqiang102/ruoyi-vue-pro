@@ -142,4 +142,7 @@ public interface ErrorCodeConstants {
     // ========== 2-000-020 预约规则（M-09） ==========
     ErrorCode RESERVE_RULE_NOT_EXISTS = new ErrorCode(2_000_020_000, "预约规则不存在");
 
+    // ========== 2-000-021 帮助文档（C-12） ==========
+    ErrorCode HELP_DOC_NOT_EXISTS = new ErrorCode(2_000_021_000, "帮助文档不存在");
+
 }

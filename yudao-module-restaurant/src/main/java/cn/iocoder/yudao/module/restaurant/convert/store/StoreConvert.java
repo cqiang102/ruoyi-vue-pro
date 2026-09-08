@@ -19,6 +19,7 @@ public class StoreConvert {
         respVO.setName(bean.getName());
         respVO.setContact(bean.getContact());
         respVO.setPhone(bean.getPhone());
+        respVO.setServiceWechat(bean.getServiceWechat());
         respVO.setAddress(bean.getAddress());
         respVO.setLatitude(bean.getLatitude());
         respVO.setLongitude(bean.getLongitude());

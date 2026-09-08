@@ -30,6 +30,38 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> imple
     private MemberConfigService memberConfigService;
     @Resource
     private MemberLevelConfigMapper memberLevelConfigMapper;
+    @Resource
+    private cn.iocoder.yudao.module.restaurant.dal.mysql.order.OrderMapper orderMapper;
+
+    @Override
+    public MemberConsumeSummaryVO getConsumeSummary(Long userId) {
+        MemberConsumeSummaryVO vo = new MemberConsumeSummaryVO();
+        if (userId == null) {
+            vo.setTotalAmount(0L);
+            vo.setOrderCount(0L);
+            return vo;
+        }
+        // 口径：已支付（pay_status = 1）且未取消/未退款（状态不在 5、7）
+        List<cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO> orders = orderMapper.selectList(
+                new LambdaQueryWrapperX<cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO>()
+                        .eq(cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO::getUserId, userId)
+                        .eq(cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO::getPayStatus, 1)
+                        .notIn(cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO::getStatus,
+                                cn.iocoder.yudao.module.restaurant.enums.order.OrderStatusEnum.CANCELED.getStatus(),
+                                cn.iocoder.yudao.module.restaurant.enums.order.OrderStatusEnum.REFUNDED.getStatus()));
+        long total = 0L;
+        java.time.LocalDateTime last = null;
+        for (cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO o : orders) {
+            total += o.getPayPrice() == null ? 0L : o.getPayPrice();
+            if (o.getCreateTime() != null && (last == null || o.getCreateTime().isAfter(last))) {
+                last = o.getCreateTime();
+            }
+        }
+        vo.setTotalAmount(total);
+        vo.setOrderCount((long) orders.size());
+        vo.setLastOrderTime(last);
+        return vo;
+    }
 
     @Override
     public MemberDO getOrCreateMember(Long userId) {

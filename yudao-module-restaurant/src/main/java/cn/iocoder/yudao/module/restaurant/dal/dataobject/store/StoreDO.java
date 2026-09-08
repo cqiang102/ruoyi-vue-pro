@@ -34,6 +34,11 @@ public class StoreDO extends TenantBaseDO {
      * 联系电话
      */
     private String phone;
+
+    /**
+     * 客服微信号（C-12：小程序端一键复制添加）
+     */
+    private String serviceWechat;
     /**
      * 地址
      */
