@@ -154,4 +154,7 @@ public interface ErrorCodeConstants {
     // ========== 2-000-023 公告（P-07） ==========
     ErrorCode NOTICE_NOT_EXISTS = new ErrorCode(2_000_023_000, "公告不存在");
 
+    // ========== 2-000-024 首页装修（M-02） ==========
+    ErrorCode HOME_DECOR_NOT_EXISTS = new ErrorCode(2_000_024_000, "装修条目不存在");
+
 }
