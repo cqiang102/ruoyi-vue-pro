@@ -38,7 +38,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
  */
 @Service
 @Slf4j
-public class StoreAuthServiceImpl implements StoreAuthService {
+public class StoreAuthLoginServiceImpl implements StoreAuthLoginService {
 
     @Resource
     private SocialUserApi socialUserApi;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.restaurant.controller.admin.member;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberVO;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class MemberController {
 
     @Resource
-    private MemberService memberService;
+    private RestaurantMemberService memberService;
 
     @GetMapping("/page")
     @Operation(summary = "会员档案分页")

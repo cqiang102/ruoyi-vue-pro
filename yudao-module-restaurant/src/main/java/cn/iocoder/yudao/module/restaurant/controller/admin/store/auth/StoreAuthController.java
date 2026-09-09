@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.store.auth.vo.StoreAuthBindReqVO;
 import cn.iocoder.yudao.module.restaurant.controller.admin.store.auth.vo.StoreAuthLoginRespVO;
 import cn.iocoder.yudao.module.restaurant.controller.admin.store.auth.vo.StoreAuthWeixinMiniAppLoginReqVO;
-import cn.iocoder.yudao.module.restaurant.service.store.auth.StoreAuthService;
+import cn.iocoder.yudao.module.restaurant.service.store.auth.StoreAuthLoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class StoreAuthController {
 
     @Resource
-    private StoreAuthService authService;
+    private StoreAuthLoginService authService;
 
     @PostMapping("/weixin-mini-app-login")
     @Operation(summary = "微信小程序登录（店员/收银）")

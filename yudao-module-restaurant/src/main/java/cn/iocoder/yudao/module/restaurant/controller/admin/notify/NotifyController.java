@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.notify.vo.NotifyVO;
 import cn.iocoder.yudao.module.restaurant.convert.notify.NotifyConvert;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyRecordDO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.RestaurantNotifyTemplateDO;
 import cn.iocoder.yudao.module.restaurant.service.notify.NotifyService;
 import cn.iocoder.yudao.module.restaurant.service.store.StoreAuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +41,7 @@ public class NotifyController {
     @PreAuthorize("hasAnyAuthority('restaurant:notify:query')")
     public CommonResult<PageResult<NotifyVO.TemplateRespVO>> getTemplatePage(
             @Valid PageParam pageParam) {
-        PageResult<NotifyTemplateDO> pageResult =
+        PageResult<RestaurantNotifyTemplateDO> pageResult =
                 notifyService.getTemplatePage(pageParam, storeAuthService.getLoginUserStoreId());
         return success(NotifyConvert.INSTANCE.convertTemplatePage(pageResult));
     }

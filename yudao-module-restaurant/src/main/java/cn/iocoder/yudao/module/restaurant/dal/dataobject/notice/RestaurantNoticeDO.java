@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @TableName("restaurant_notice")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NoticeDO extends TenantBaseDO {
+public class RestaurantNoticeDO extends TenantBaseDO {
 
     @TableId(type = IdType.AUTO)
     private Long id;

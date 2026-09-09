@@ -1,0 +1,23 @@
+# ============================================================
+# 启动冒烟 profile（smoke）：覆盖数据源与 Redis 指向 docker-compose 栈
+# 用法：java -jar yudao-server.jar --spring.profiles.active=local,smoke
+# 或：  mvn -pl yudao-server spring-boot:run -Dspring-boot.run.profiles=local,smoke
+# 密码与项目根 docker-compose.yml 一致（仅本地联调用，勿用于生产）。
+# 注意：Spring Boot 2.7 的 Redisson 读 spring.redis.*（非 Boot 3 的 spring.data.redis.*）。
+# ============================================================
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    password: restaurant123
+  datasource:
+    dynamic:
+      datasource:
+        master:
+          url: jdbc:mysql://127.0.0.1:33306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+          username: root
+          password: restaurant123
+        slave:
+          url: jdbc:mysql://127.0.0.1:33306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+          username: root
+          password: restaurant123

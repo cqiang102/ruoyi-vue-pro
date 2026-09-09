@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.restaurant.controller.app.notice;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.restaurant.service.notice.NoticeService;
+import cn.iocoder.yudao.module.restaurant.service.notice.RestaurantNoticeService;
 import cn.iocoder.yudao.module.restaurant.service.notice.NoticeVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class AppNoticeController {
 
     @Resource
-    private NoticeService noticeService;
+    private RestaurantNoticeService noticeService;
 
     @GetMapping("/list")
     @Operation(summary = "公告列表（本店 + 全平台，已发布）")

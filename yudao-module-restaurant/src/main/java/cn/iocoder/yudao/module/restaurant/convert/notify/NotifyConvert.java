@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.restaurant.convert.notify;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.notify.vo.NotifyVO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyRecordDO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.RestaurantNotifyTemplateDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -19,11 +19,11 @@ public interface NotifyConvert {
 
     NotifyConvert INSTANCE = Mappers.getMapper(NotifyConvert.class);
 
-    NotifyVO.TemplateRespVO convert(NotifyTemplateDO bean);
+    NotifyVO.TemplateRespVO convert(RestaurantNotifyTemplateDO bean);
 
-    List<NotifyVO.TemplateRespVO> convertTemplateList(List<NotifyTemplateDO> list);
+    List<NotifyVO.TemplateRespVO> convertTemplateList(List<RestaurantNotifyTemplateDO> list);
 
-    default PageResult<NotifyVO.TemplateRespVO> convertTemplatePage(PageResult<NotifyTemplateDO> pageResult) {
+    default PageResult<NotifyVO.TemplateRespVO> convertTemplatePage(PageResult<RestaurantNotifyTemplateDO> pageResult) {
         return new PageResult<>(convertTemplateList(pageResult.getList()), pageResult.getTotal());
     }
 

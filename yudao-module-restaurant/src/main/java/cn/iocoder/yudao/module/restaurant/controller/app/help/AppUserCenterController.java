@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.restaurant.service.help.HelpDocService;
 import cn.iocoder.yudao.module.restaurant.service.help.HelpDocVO;
 import cn.iocoder.yudao.module.restaurant.service.member.MemberConsumeSummaryVO;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class AppUserCenterController {
 
     @Resource
-    private MemberService memberService;
+    private RestaurantMemberService memberService;
 
     @Resource
     private HelpDocService helpDocService;

@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/member/address")
 @Validated
-public class MemberAddressController {
+public class AppMemberAddressController {
 
     @Resource
     private MemberAddressService memberAddressService;

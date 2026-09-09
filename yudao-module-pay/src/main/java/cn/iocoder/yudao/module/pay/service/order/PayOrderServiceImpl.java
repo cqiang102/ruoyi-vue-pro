@@ -61,7 +61,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     private PayProperties payProperties;
 
     @Resource
-    private PayOrderMapper orderMapper;
+    private PayOrderMapper payOrderMapper;
     @Resource
     private PayOrderExtensionMapper orderExtensionMapper;
     @Resource
@@ -76,17 +76,17 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     public PayOrderDO getOrder(Long id) {
-        return orderMapper.selectById(id);
+        return payOrderMapper.selectById(id);
     }
 
     @Override
     public PayOrderDO getOrder(String no) {
-        return orderMapper.selectByNo(no);
+        return payOrderMapper.selectByNo(no);
     }
 
     @Override
     public PayOrderDO getOrder(Long appId, String merchantOrderId) {
-        return orderMapper.selectByAppIdAndMerchantOrderId(appId, merchantOrderId);
+        return payOrderMapper.selectByAppIdAndMerchantOrderId(appId, merchantOrderId);
     }
 
     @Override
@@ -94,22 +94,22 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return orderMapper.selectByIds(ids);
+        return payOrderMapper.selectByIds(ids);
     }
 
     @Override
     public Long getOrderCountByAppId(Long appId) {
-        return orderMapper.selectCountByAppId(appId);
+        return payOrderMapper.selectCountByAppId(appId);
     }
 
     @Override
     public PageResult<PayOrderDO> getOrderPage(PayOrderPageReqVO pageReqVO) {
-        return orderMapper.selectPage(pageReqVO);
+        return payOrderMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<PayOrderDO> getOrderList(PayOrderExportReqVO exportReqVO) {
-        return orderMapper.selectList(exportReqVO);
+        return payOrderMapper.selectList(exportReqVO);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
 
         // 查询对应的支付交易单是否已经存在。如果是，则直接返回
-        PayOrderDO order = orderMapper.selectByAppIdAndMerchantOrderId(
+        PayOrderDO order = payOrderMapper.selectByAppIdAndMerchantOrderId(
                 app.getId(), reqDTO.getMerchantOrderId());
         if (order != null) {
             log.warn("[createOrder][appId({}) merchantOrderId({}) 已经存在对应的支付单({})]", order.getAppId(),
@@ -134,7 +134,7 @@ public class PayOrderServiceImpl implements PayOrderService {
                 .setStatus(PayOrderStatusEnum.WAITING.getStatus())
                 // 退款相关字段
                 .setRefundPrice(0);
-        orderMapper.insert(order);
+        payOrderMapper.insert(order);
         return order.getId();
     }
 
@@ -181,13 +181,13 @@ public class PayOrderServiceImpl implements PayOrderService {
                         unifiedOrderResp.getChannelErrorMsg());
             }
             // 此处需要读取最新的状态
-            order = orderMapper.selectById(order.getId());
+            order = payOrderMapper.selectById(order.getId());
         }
         return PayOrderConvert.INSTANCE.convert(order, unifiedOrderResp);
     }
 
     private PayOrderDO validateOrderCanSubmit(Long id) {
-        PayOrderDO order = orderMapper.selectById(id);
+        PayOrderDO order = payOrderMapper.selectById(id);
         if (order == null) { // 是否存在
             throw exception(PAY_ORDER_NOT_FOUND);
         }
@@ -344,7 +344,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     private Boolean updateOrderSuccess(PayChannelDO channel, PayOrderExtensionDO orderExtension,
                                        PayOrderRespDTO notify) {
         // 1. 判断 PayOrderDO 是否处于待支付
-        PayOrderDO order = orderMapper.selectById(orderExtension.getOrderId());
+        PayOrderDO order = payOrderMapper.selectById(orderExtension.getOrderId());
         if (order == null) {
             throw exception(PAY_ORDER_NOT_FOUND);
         }
@@ -358,7 +358,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         }
 
         // 2. 更新 PayOrderDO
-        int updateCounts = orderMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
+        int updateCounts = payOrderMapper.updateByIdAndStatus(order.getId(), PayOrderStatusEnum.WAITING.getStatus(),
                 PayOrderDO.builder().status(PayOrderStatusEnum.SUCCESS.getStatus())
                         .channelId(channel.getId()).channelCode(channel.getCode())
                         .successTime(notify.getSuccessTime()).extensionId(orderExtension.getId()).no(orderExtension.getNo())
@@ -409,7 +409,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     public void updateOrderRefundPrice(Long id, Integer incrRefundPrice) {
-        PayOrderDO order = orderMapper.selectById(id);
+        PayOrderDO order = payOrderMapper.selectById(id);
         if (order == null) {
             throw exception(PAY_ORDER_NOT_FOUND);
         }
@@ -424,7 +424,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         PayOrderDO updateObj = new PayOrderDO()
                 .setRefundPrice(order.getRefundPrice() + incrRefundPrice)
                 .setStatus(PayOrderStatusEnum.REFUND.getStatus());
-        int updateCount = orderMapper.updateByIdAndStatus(id, order.getStatus(), updateObj);
+        int updateCount = payOrderMapper.updateByIdAndStatus(id, order.getStatus(), updateObj);
         if (updateCount == 0) {
             throw exception(PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
         }
@@ -432,7 +432,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
     @Override
     public void updatePayOrderPrice(Long id, Integer payPrice) {
-        PayOrderDO order = orderMapper.selectById(id);
+        PayOrderDO order = payOrderMapper.selectById(id);
         if (order == null) {
             throw exception(PAY_ORDER_NOT_FOUND);
         }
@@ -443,7 +443,7 @@ public class PayOrderServiceImpl implements PayOrderService {
             return;
         }
 
-        orderMapper.updateById(new PayOrderDO().setId(order.getId()).setPrice(payPrice));
+        payOrderMapper.updateById(new PayOrderDO().setId(order.getId()).setPrice(payPrice));
     }
 
     @Override
@@ -521,7 +521,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     @Override
     public int expireOrder() {
         // 1. 查询过期的待支付订单
-        List<PayOrderDO> orders = orderMapper.selectListByStatusAndExpireTimeLt(
+        List<PayOrderDO> orders = payOrderMapper.selectListByStatusAndExpireTimeLt(
                 PayOrderStatusEnum.WAITING.getStatus(), LocalDateTime.now());
         if (CollUtil.isEmpty(orders)) {
             return 0;
@@ -586,7 +586,7 @@ public class PayOrderServiceImpl implements PayOrderService {
 
             // 2. 都没有上述情况，可以安心更新为已关闭
             PayOrderDO updateObj = new PayOrderDO().setStatus(PayOrderStatusEnum.CLOSED.getStatus());
-            if (orderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateObj) == 0) {
+            if (payOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateObj) == 0) {
                 log.error("[expireOrder][order({}) 更新为支付关闭失败]", order.getId());
                 return false;
             }

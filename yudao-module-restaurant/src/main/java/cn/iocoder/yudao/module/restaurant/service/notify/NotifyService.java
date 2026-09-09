@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.notify.vo.NotifyVO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyRecordDO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.RestaurantNotifyTemplateDO;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ public interface NotifyService {
     /**
      * 模板分页（本店 + 平台默认）
      */
-    PageResult<NotifyTemplateDO> getTemplatePage(PageParam pageParam, Long storeId);
+    PageResult<RestaurantNotifyTemplateDO> getTemplatePage(PageParam pageParam, Long storeId);
 
     /**
      * 创建模板（P1-A：storeId 由登录店员注入）

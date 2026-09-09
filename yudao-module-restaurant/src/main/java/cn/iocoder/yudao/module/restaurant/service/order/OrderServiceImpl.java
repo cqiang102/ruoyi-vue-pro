@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.restaurant.dal.mysql.store.TableMapper;
 import cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.restaurant.enums.order.OrderStatusEnum;
 import cn.iocoder.yudao.module.restaurant.enums.order.OrderTypeEnum;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberService;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.restaurant.service.pay.OrderPayService;
 import cn.iocoder.yudao.module.restaurant.service.pay.WalletPayService;
@@ -104,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private WalletPayService walletPayService;
     @Resource
-    private MemberService memberService;
+    private RestaurantMemberService memberService;
     @Resource
     private CouponService couponService;
     @Resource

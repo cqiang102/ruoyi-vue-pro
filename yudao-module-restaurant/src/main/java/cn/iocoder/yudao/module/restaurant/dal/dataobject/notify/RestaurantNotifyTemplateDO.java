@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @TableName("restaurant_notify_template")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NotifyTemplateDO extends TenantBaseDO {
+public class RestaurantNotifyTemplateDO extends TenantBaseDO {
 
     /**
      * 模板编号

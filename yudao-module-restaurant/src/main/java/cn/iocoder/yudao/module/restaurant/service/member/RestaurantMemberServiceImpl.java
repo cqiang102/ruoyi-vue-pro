@@ -24,7 +24,7 @@ import java.util.List;
  * @author 餐饮 SaaS
  */
 @Service
-public class MemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> implements MemberService {
+public class RestaurantMemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> implements RestaurantMemberService {
 
     @Resource
     private MemberConfigService memberConfigService;

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberVO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberDO;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -18,10 +18,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/member/me")
 @Validated
-public class MemberController {
+public class AppMemberController {
 
     @Resource
-    private MemberService memberService;
+    private RestaurantMemberService memberService;
 
     @PostMapping("/bind")
     @Operation(summary = "获取或创建我的会员档案")

@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.restaurant.dal.dataobject.point.PointProductDO;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.member.MemberMapper;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.point.PointOrderMapper;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.point.PointProductMapper;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class PointShopServiceImpl implements PointShopService {
     @Resource
     private MemberMapper memberMapper;
     @Resource
-    private MemberService memberService;
+    private RestaurantMemberService memberService;
 
     // ===================== admin 端 =====================
 

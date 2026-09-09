@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.restaurant.controller.admin.notice;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.restaurant.service.notice.NoticeService;
+import cn.iocoder.yudao.module.restaurant.service.notice.RestaurantNoticeService;
 import cn.iocoder.yudao.module.restaurant.service.notice.NoticeVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,10 +25,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/store/notice")
 @Validated
-public class NoticeController {
+public class RestaurantNoticeController {
 
     @Resource
-    private NoticeService noticeService;
+    private RestaurantNoticeService noticeService;
 
     @PostMapping("/create")
     @Operation(summary = "发布公告")

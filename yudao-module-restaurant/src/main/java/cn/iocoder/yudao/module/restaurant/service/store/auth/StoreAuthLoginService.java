@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.restaurant.controller.admin.store.auth.vo.StoreAu
  *
  * @author 餐饮 SaaS
  */
-public interface StoreAuthService {
+public interface StoreAuthLoginService {
 
     /**
      * 微信小程序登录

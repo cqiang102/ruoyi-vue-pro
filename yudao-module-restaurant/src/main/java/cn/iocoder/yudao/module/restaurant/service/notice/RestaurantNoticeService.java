@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.restaurant.service.notice;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.notice.NoticeDO;
-import cn.iocoder.yudao.module.restaurant.dal.mysql.notice.NoticeMapper;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.notice.RestaurantNoticeDO;
+import cn.iocoder.yudao.module.restaurant.dal.mysql.notice.RestaurantNoticeMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,13 +17,13 @@ import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.NOTICE
  * @author 餐饮 SaaS
  */
 @Service
-public class NoticeService {
+public class RestaurantNoticeService {
 
     @Resource
-    private NoticeMapper noticeMapper;
+    private RestaurantNoticeMapper restaurantNoticeMapper;
 
     public Long createNotice(NoticeVO reqVO) {
-        NoticeDO notice = BeanUtils.toBean(reqVO, NoticeDO.class);
+        RestaurantNoticeDO notice = BeanUtils.toBean(reqVO, RestaurantNoticeDO.class);
         if (notice.getStatus() == null) {
             notice.setStatus(0);
         }
@@ -33,25 +33,25 @@ public class NoticeService {
         if (notice.getStoreId() == null) {
             notice.setStoreId(0L);
         }
-        noticeMapper.insert(notice);
+        restaurantNoticeMapper.insert(notice);
         return notice.getId();
     }
 
     public void updateNotice(NoticeVO reqVO) {
         validateExists(reqVO.getId());
-        noticeMapper.updateById(BeanUtils.toBean(reqVO, NoticeDO.class));
+        restaurantNoticeMapper.updateById(BeanUtils.toBean(reqVO, RestaurantNoticeDO.class));
     }
 
     public void deleteNotice(Long id) {
         validateExists(id);
-        noticeMapper.deleteById(id);
+        restaurantNoticeMapper.deleteById(id);
     }
 
     public List<NoticeVO> getNoticeList(Long storeId) {
-        List<NoticeDO> list = noticeMapper.selectList(
-                new cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX<NoticeDO>()
-                        .eqIfPresent(NoticeDO::getStoreId, storeId)
-                        .orderByDesc(NoticeDO::getId));
+        List<RestaurantNoticeDO> list = restaurantNoticeMapper.selectList(
+                new cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX<RestaurantNoticeDO>()
+                        .eqIfPresent(RestaurantNoticeDO::getStoreId, storeId)
+                        .orderByDesc(RestaurantNoticeDO::getId));
         return BeanUtils.toBean(list, NoticeVO.class);
     }
 
@@ -59,11 +59,11 @@ public class NoticeService {
      * 会员端：本店 + 全平台，只取已发布
      */
     public List<NoticeVO> getNoticeListForMember(Long storeId) {
-        return BeanUtils.toBean(noticeMapper.selectVisibleList(storeId), NoticeVO.class);
+        return BeanUtils.toBean(restaurantNoticeMapper.selectVisibleList(storeId), NoticeVO.class);
     }
 
     private void validateExists(Long id) {
-        if (id == null || noticeMapper.selectById(id) == null) {
+        if (id == null || restaurantNoticeMapper.selectById(id) == null) {
             throw exception(NOTICE_NOT_EXISTS);
         }
     }

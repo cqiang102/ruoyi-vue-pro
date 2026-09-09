@@ -10,9 +10,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.restaurant.controller.admin.notify.vo.NotifyVO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyRecordDO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.NotifyTemplateDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.notify.RestaurantNotifyTemplateDO;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.notify.NotifyRecordMapper;
-import cn.iocoder.yudao.module.restaurant.dal.mysql.notify.NotifyTemplateMapper;
+import cn.iocoder.yudao.module.restaurant.dal.mysql.notify.RestaurantNotifyTemplateMapper;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
@@ -63,7 +63,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Resource
-    private NotifyTemplateMapper notifyTemplateMapper;
+    private RestaurantNotifyTemplateMapper restaurantNotifyTemplateMapper;
     @Resource
     private NotifyRecordMapper notifyRecordMapper;
     @Resource
@@ -85,7 +85,7 @@ public class NotifyServiceImpl implements NotifyService {
     private void doSend(Long userId, Long storeId, String scene, Long orderId,
                         Map<String, String> messages, String page) {
         // 1. 场景模板（本店优先，回退平台默认）
-        NotifyTemplateDO template = notifyTemplateMapper.selectEnabled(storeId, scene);
+        RestaurantNotifyTemplateDO template = restaurantNotifyTemplateMapper.selectEnabled(storeId, scene);
         if (template == null) {
             log.info("[doSend][场景({}) 未配置启用模板，跳过发送 storeId({})]", scene, storeId);
             return;
@@ -130,7 +130,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     private void saveRecord(Long storeId, Long userId, String openid, Long orderId, String scene,
-                            NotifyTemplateDO template, String page, Map<String, String> messages,
+                            RestaurantNotifyTemplateDO template, String page, Map<String, String> messages,
                             Integer status, String errorMsg) {
         try {
             NotifyRecordDO record = new NotifyRecordDO();
@@ -155,51 +155,51 @@ public class NotifyServiceImpl implements NotifyService {
     // ========== 模板管理 ==========
 
     @Override
-    public PageResult<NotifyTemplateDO> getTemplatePage(PageParam pageParam, Long storeId) {
-        return notifyTemplateMapper.selectPage(pageParam, new LambdaQueryWrapperX<NotifyTemplateDO>()
-                .eq(NotifyTemplateDO::getStoreId, storeId)
-                .orderByAsc(NotifyTemplateDO::getId));
+    public PageResult<RestaurantNotifyTemplateDO> getTemplatePage(PageParam pageParam, Long storeId) {
+        return restaurantNotifyTemplateMapper.selectPage(pageParam, new LambdaQueryWrapperX<RestaurantNotifyTemplateDO>()
+                .eq(RestaurantNotifyTemplateDO::getStoreId, storeId)
+                .orderByAsc(RestaurantNotifyTemplateDO::getId));
     }
 
     @Override
     public Long createTemplate(NotifyVO.TemplateSaveReqVO reqVO, Long storeId) {
         // 同门店同场景唯一（平台默认模板 storeId=0 亦然）
-        NotifyTemplateDO exist = notifyTemplateMapper.selectOne(new LambdaQueryWrapperX<NotifyTemplateDO>()
-                .eq(NotifyTemplateDO::getStoreId, storeId)
-                .eq(NotifyTemplateDO::getScene, reqVO.getScene()));
+        RestaurantNotifyTemplateDO exist = restaurantNotifyTemplateMapper.selectOne(new LambdaQueryWrapperX<RestaurantNotifyTemplateDO>()
+                .eq(RestaurantNotifyTemplateDO::getStoreId, storeId)
+                .eq(RestaurantNotifyTemplateDO::getScene, reqVO.getScene()));
         if (exist != null) {
             throw exception(NOTIFY_TEMPLATE_SCENE_DUPLICATE);
         }
-        NotifyTemplateDO template = new NotifyTemplateDO();
+        RestaurantNotifyTemplateDO template = new RestaurantNotifyTemplateDO();
         template.setStoreId(storeId);
         template.setScene(reqVO.getScene());
         template.setTemplateTitle(reqVO.getTemplateTitle());
         template.setKeywordConfig(reqVO.getKeywordConfig());
         template.setPage(reqVO.getPage());
         template.setStatus(reqVO.getStatus() == null ? 1 : reqVO.getStatus());
-        notifyTemplateMapper.insert(template);
+        restaurantNotifyTemplateMapper.insert(template);
         return template.getId();
     }
 
     @Override
     public void updateTemplate(NotifyVO.TemplateSaveReqVO reqVO, Long storeId) {
-        NotifyTemplateDO template = validateTemplate(reqVO.getId(), storeId);
+        RestaurantNotifyTemplateDO template = validateTemplate(reqVO.getId(), storeId);
         template.setScene(reqVO.getScene());
         template.setTemplateTitle(reqVO.getTemplateTitle());
         template.setKeywordConfig(reqVO.getKeywordConfig());
         template.setPage(reqVO.getPage());
         template.setStatus(reqVO.getStatus() == null ? template.getStatus() : reqVO.getStatus());
-        notifyTemplateMapper.updateById(template);
+        restaurantNotifyTemplateMapper.updateById(template);
     }
 
     @Override
     public void deleteTemplate(Long id, Long storeId) {
         validateTemplate(id, storeId);
-        notifyTemplateMapper.deleteById(id);
+        restaurantNotifyTemplateMapper.deleteById(id);
     }
 
-    private NotifyTemplateDO validateTemplate(Long id, Long storeId) {
-        NotifyTemplateDO template = notifyTemplateMapper.selectById(id);
+    private RestaurantNotifyTemplateDO validateTemplate(Long id, Long storeId) {
+        RestaurantNotifyTemplateDO template = restaurantNotifyTemplateMapper.selectById(id);
         if (template == null || !ObjectUtil.equal(template.getStoreId(), storeId)) {
             throw exception(NOTIFY_TEMPLATE_NOT_EXISTS);
         }
@@ -214,8 +214,8 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public List<String> getSubscribeTemplateIds() {
         // 1. 本租户已启用的模板标题（平台默认 + 各门店，去重）
-        List<NotifyTemplateDO> templates = notifyTemplateMapper.selectList(
-                new LambdaQueryWrapperX<NotifyTemplateDO>().eq(NotifyTemplateDO::getStatus, 1));
+        List<RestaurantNotifyTemplateDO> templates = restaurantNotifyTemplateMapper.selectList(
+                new LambdaQueryWrapperX<RestaurantNotifyTemplateDO>().eq(RestaurantNotifyTemplateDO::getStatus, 1));
         if (CollUtil.isEmpty(templates)) {
             return new ArrayList<>();
         }
@@ -228,7 +228,7 @@ public class NotifyServiceImpl implements NotifyService {
             return new ArrayList<>();
         }
         List<String> ids = new ArrayList<>();
-        for (NotifyTemplateDO t : templates) {
+        for (RestaurantNotifyTemplateDO t : templates) {
             if (CollUtil.isEmpty(wxTemplates)) {
                 break;
             }

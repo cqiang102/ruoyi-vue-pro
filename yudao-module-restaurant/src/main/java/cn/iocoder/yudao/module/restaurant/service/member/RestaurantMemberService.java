@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberDO;
  *
  * @author 餐饮 SaaS
  */
-public interface MemberService {
+public interface RestaurantMemberService {
 
     /**
      * 历史消费汇总（C-12 用户中心）：累计消费金额（分）、订单数、最近下单时间
