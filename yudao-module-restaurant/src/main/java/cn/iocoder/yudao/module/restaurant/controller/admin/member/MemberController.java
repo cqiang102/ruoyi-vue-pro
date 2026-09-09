@@ -25,14 +25,14 @@ public class MemberController {
 
     @GetMapping("/page")
     @Operation(summary = "会员档案分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:member:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member:query')")
     public CommonResult<PageResult<MemberVO.RespVO>> getMemberPage(@Validated MemberVO.PageReqVO pageReqVO) {
         return success(memberService.getMemberPage(pageReqVO));
     }
 
     @GetMapping("/get-by-user")
     @Operation(summary = "按用户编号查询会员档案")
-    @PreAuthorize("hasAnyAuthority('restaurant:member:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member:query')")
     public CommonResult<MemberVO.RespVO> getMemberByUser(@RequestParam("userId") Long userId) {
         return success(memberService.getMemberPage(
                 new MemberVO.PageReqVO() {{
@@ -42,7 +42,7 @@ public class MemberController {
 
     @PutMapping("/update-tags")
     @Operation(summary = "更新会员标签（M-22）")
-    @PreAuthorize("hasAnyAuthority('restaurant:member:update-tag')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member:update-tag')")
     public CommonResult<Boolean> updateTags(@Validated @RequestBody MemberVO.TagUpdateReqVO reqVO) {
         memberService.updateTags(reqVO);
         return success(true);

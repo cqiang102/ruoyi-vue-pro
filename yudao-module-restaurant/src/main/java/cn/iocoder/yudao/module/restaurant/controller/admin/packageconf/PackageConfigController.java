@@ -26,14 +26,14 @@ public class PackageConfigController {
 
     @PostMapping("/create")
     @Operation(summary = "创建套餐")
-    @PreAuthorize("hasAnyAuthority('restaurant:package:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:package:create')")
     public CommonResult<Long> createPackage(@RequestBody @Valid PackageConfigVO.SaveReqVO reqVO) {
         return success(packageConfigService.createPackage(reqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新套餐")
-    @PreAuthorize("hasAnyAuthority('restaurant:package:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:package:update')")
     public CommonResult<Boolean> updatePackage(@RequestBody @Valid PackageConfigVO.SaveReqVO reqVO) {
         packageConfigService.updatePackage(reqVO.getId(), reqVO);
         return success(true);
@@ -41,7 +41,7 @@ public class PackageConfigController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除套餐")
-    @PreAuthorize("hasAnyAuthority('restaurant:package:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:package:delete')")
     public CommonResult<Boolean> deletePackage(@RequestParam("id") Long id) {
         packageConfigService.deletePackage(id);
         return success(true);
@@ -49,7 +49,7 @@ public class PackageConfigController {
 
     @GetMapping("/page")
     @Operation(summary = "套餐分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:package:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:package:query')")
     public CommonResult<PageResult<PackageConfigVO.RespVO>> getPackagePage(
             @Validated PackageConfigVO.PageReqVO pageReqVO) {
         return success(packageConfigService.getPackagePage(pageReqVO));
@@ -57,7 +57,7 @@ public class PackageConfigController {
 
     @GetMapping("/get")
     @Operation(summary = "获得套餐")
-    @PreAuthorize("hasAnyAuthority('restaurant:package:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:package:query')")
     public CommonResult<PackageConfigVO.RespVO> getPackage(@RequestParam("id") Long id) {
         return success(packageConfigService.getPackage(id));
     }

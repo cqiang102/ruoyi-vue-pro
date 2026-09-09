@@ -30,14 +30,14 @@ public class MemberConfigController {
 
     @GetMapping("/get")
     @Operation(summary = "获取当前租户会员营销配置")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-config:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-config:query')")
     public CommonResult<MemberConfigVO.RespVO> get() {
         return success(memberConfigService.getConfig());
     }
 
     @PostMapping("/save")
     @Operation(summary = "保存（新增/更新）会员营销配置")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-config:save')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-config:save')")
     public CommonResult<Boolean> save(@RequestBody @Valid MemberConfigVO.SaveReqVO reqVO) {
         memberConfigService.saveConfig(reqVO);
         return success(true);

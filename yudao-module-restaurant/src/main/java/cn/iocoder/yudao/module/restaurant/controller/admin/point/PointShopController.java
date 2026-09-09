@@ -42,7 +42,7 @@ public class PointShopController {
 
     @GetMapping("/product-page")
     @Operation(summary = "积分商品分页（本店）")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:query')")
     public CommonResult<PageResult<PointShopVO.ProductRespVO>> getProductPage(
             @Valid PageParam pageParam,
             @RequestParam(value = "status", required = false) Integer status) {
@@ -67,14 +67,14 @@ public class PointShopController {
 
     @PostMapping("/product/create")
     @Operation(summary = "创建积分商品")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:create')")
     public CommonResult<Long> createProduct(@Valid @RequestBody PointShopVO.ProductSaveReqVO reqVO) {
         return success(pointShopService.createProduct(reqVO, storeAuthService.getLoginUserStoreId()));
     }
 
     @PutMapping("/product/update")
     @Operation(summary = "更新积分商品")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:update')")
     public CommonResult<Boolean> updateProduct(@Valid @RequestBody PointShopVO.ProductSaveReqVO reqVO) {
         pointShopService.updateProduct(reqVO, storeAuthService.getLoginUserStoreId());
         return success(true);
@@ -82,7 +82,7 @@ public class PointShopController {
 
     @DeleteMapping("/product/delete")
     @Operation(summary = "删除积分商品（仅下架状态）")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:delete')")
     public CommonResult<Boolean> deleteProduct(@RequestParam("id") Long id) {
         pointShopService.deleteProduct(id, storeAuthService.getLoginUserStoreId());
         return success(true);
@@ -90,7 +90,7 @@ public class PointShopController {
 
     @GetMapping("/order-page")
     @Operation(summary = "兑换记录分页（本店）")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:query')")
     public CommonResult<PageResult<PointShopVO.OrderRespVO>> getOrderPage(
             @Valid PageParam pageParam,
             @RequestParam(value = "status", required = false) Integer status) {
@@ -118,7 +118,7 @@ public class PointShopController {
 
     @PostMapping("/verify")
     @Operation(summary = "店员核销（按会员出示的核销码）")
-    @PreAuthorize("hasAnyAuthority('restaurant:point-shop:verify')")
+    @PreAuthorize("@ss.hasPermission('restaurant:point-shop:verify')")
     public CommonResult<PointShopVO.VerifyRespVO> verify(@RequestParam("verifyCode") String verifyCode) {
         return success(pointShopService.verify(verifyCode, storeAuthService.getLoginUserStoreId()));
     }

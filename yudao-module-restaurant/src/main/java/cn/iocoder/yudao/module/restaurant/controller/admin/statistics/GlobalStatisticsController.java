@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 /**
  * 平台运营 - 全局统计（P-06）
  *
- * <p>跨租户聚合，仅平台管理员可见。注意 Controller 用 hasAnyAuthority（平台端惯例）。
+ * <p>跨租户聚合，仅平台管理员可见。注意 Controller 用 @ss.hasPermission（芋道惯例）。
  *
  * @author 餐饮 SaaS
  */
@@ -34,21 +34,21 @@ public class GlobalStatisticsController {
 
     @GetMapping("/overview")
     @Operation(summary = "总览（商户数/会员数/累计与今日 GMV、订单数）")
-    @PreAuthorize("hasAnyAuthority('restaurant:global-stat:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:global-stat:query')")
     public CommonResult<Map<String, Object>> getOverview() {
         return success(globalStatisticsService.getOverview());
     }
 
     @GetMapping("/trend")
     @Operation(summary = "近 30 天 GMV/订单趋势")
-    @PreAuthorize("hasAnyAuthority('restaurant:global-stat:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:global-stat:query')")
     public CommonResult<List<Map<String, Object>>> getTrend() {
         return success(globalStatisticsService.getTrend());
     }
 
     @GetMapping("/store-top")
     @Operation(summary = "门店 GMV TOP10（近 30 天）")
-    @PreAuthorize("hasAnyAuthority('restaurant:global-stat:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:global-stat:query')")
     public CommonResult<List<Map<String, Object>>> getStoreTop() {
         return success(globalStatisticsService.getStoreTop());
     }

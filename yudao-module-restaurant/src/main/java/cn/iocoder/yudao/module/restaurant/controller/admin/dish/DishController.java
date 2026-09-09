@@ -27,14 +27,14 @@ public class DishController {
 
     @PostMapping("/create")
     @Operation(summary = "创建菜品（含规格/加料）")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:create')")
     public CommonResult<Long> createDish(@RequestBody @Valid DishVO.SaveReqVO createReqVO) {
         return success(dishService.createDish(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新菜品（含规格/加料）")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:update')")
     public CommonResult<Boolean> updateDish(@RequestBody @Valid DishVO.SaveReqVO updateReqVO) {
         dishService.updateDish(updateReqVO);
         return success(true);
@@ -42,7 +42,7 @@ public class DishController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜品")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:delete')")
     public CommonResult<Boolean> deleteDish(@RequestParam("id") Long id) {
         dishService.deleteDish(id);
         return success(true);
@@ -50,21 +50,21 @@ public class DishController {
 
     @GetMapping("/get")
     @Operation(summary = "获得菜品（含规格/加料）")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:query')")
     public CommonResult<DishVO.RespVO> getDish(@RequestParam("id") Long id) {
         return success(dishService.getDish(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得菜品分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:query')")
     public CommonResult<PageResult<DishVO.RespVO>> getDishPage(@Valid DishVO.PageReqVO pageReqVO) {
         return success(dishService.getDishPage(pageReqVO));
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得菜品精简列表（含规格/加料，点餐/下单用）")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish:query')")
     public CommonResult<List<DishVO.RespVO>> getDishSimpleList(
             @RequestParam(value = "categoryId", required = false) Long categoryId) {
         return success(dishService.getDishSimpleList(categoryId));

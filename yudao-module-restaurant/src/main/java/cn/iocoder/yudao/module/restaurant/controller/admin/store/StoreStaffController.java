@@ -34,14 +34,14 @@ public class StoreStaffController {
 
     @PostMapping("/create")
     @Operation(summary = "绑定店员账号到门店")
-    @PreAuthorize("hasAnyAuthority('restaurant:store-staff:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store-staff:create')")
     public CommonResult<Long> createStoreStaff(@RequestBody @Valid StoreStaffVO.SaveReqVO createReqVO) {
         return success(storeStaffService.createStoreStaff(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新店员绑定")
-    @PreAuthorize("hasAnyAuthority('restaurant:store-staff:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store-staff:update')")
     public CommonResult<Boolean> updateStoreStaff(@RequestBody @Valid StoreStaffVO.SaveReqVO updateReqVO) {
         storeStaffService.updateStoreStaff(updateReqVO);
         return success(true);
@@ -49,7 +49,7 @@ public class StoreStaffController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除店员绑定")
-    @PreAuthorize("hasAnyAuthority('restaurant:store-staff:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store-staff:delete')")
     public CommonResult<Boolean> deleteStoreStaff(@RequestParam("id") Long id) {
         storeStaffService.deleteStoreStaff(id);
         return success(true);
@@ -57,14 +57,14 @@ public class StoreStaffController {
 
     @GetMapping("/get")
     @Operation(summary = "获得店员绑定详情")
-    @PreAuthorize("hasAnyAuthority('restaurant:store-staff:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store-staff:query')")
     public CommonResult<StoreStaffVO.RespVO> getStoreStaff(@RequestParam("id") Long id) {
         return success(storeStaffService.getStoreStaff(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得店员绑定分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:store-staff:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store-staff:query')")
     public CommonResult<PageResult<StoreStaffVO.RespVO>> getStoreStaffPage(@Valid StoreStaffVO.PageReqVO pageReqVO) {
         return success(storeStaffService.getStoreStaffPage(pageReqVO));
     }

@@ -26,14 +26,14 @@ public class CouponTemplateController {
 
     @PostMapping("/create")
     @Operation(summary = "创建优惠券模板")
-    @PreAuthorize("hasAnyAuthority('restaurant:coupon-template:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:coupon-template:create')")
     public CommonResult<Long> createTemplate(@RequestBody @Valid CouponTemplateVO.SaveReqVO reqVO) {
         return success(couponService.createTemplate(reqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新优惠券模板")
-    @PreAuthorize("hasAnyAuthority('restaurant:coupon-template:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:coupon-template:update')")
     public CommonResult<Boolean> updateTemplate(@RequestBody @Valid CouponTemplateVO.SaveReqVO reqVO) {
         couponService.updateTemplate(reqVO.getId(), reqVO);
         return success(true);
@@ -41,7 +41,7 @@ public class CouponTemplateController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除优惠券模板")
-    @PreAuthorize("hasAnyAuthority('restaurant:coupon-template:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:coupon-template:delete')")
     public CommonResult<Boolean> deleteTemplate(@RequestParam("id") Long id) {
         couponService.deleteTemplate(id);
         return success(true);
@@ -49,7 +49,7 @@ public class CouponTemplateController {
 
     @GetMapping("/page")
     @Operation(summary = "优惠券模板分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:coupon-template:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:coupon-template:query')")
     public CommonResult<PageResult<CouponTemplateVO.RespVO>> getTemplatePage(
             @Validated CouponTemplateVO.PageReqVO pageReqVO) {
         return success(couponService.getTemplatePage(pageReqVO));
@@ -57,7 +57,7 @@ public class CouponTemplateController {
 
     @GetMapping("/get")
     @Operation(summary = "获得优惠券模板")
-    @PreAuthorize("hasAnyAuthority('restaurant:coupon-template:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:coupon-template:query')")
     public CommonResult<CouponTemplateVO.RespVO> getTemplate(@RequestParam("id") Long id) {
         return success(couponService.getTemplate(id));
     }

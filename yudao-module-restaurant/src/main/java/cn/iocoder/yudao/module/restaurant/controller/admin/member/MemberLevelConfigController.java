@@ -32,14 +32,14 @@ public class MemberLevelConfigController {
 
     @PostMapping("/create")
     @Operation(summary = "创建会员等级")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:create')")
     public CommonResult<Long> create(@RequestBody @Valid MemberLevelConfigVO.SaveReqVO reqVO) {
         return success(memberLevelConfigService.createLevel(reqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新会员等级")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:update')")
     public CommonResult<Boolean> update(@RequestParam("id") Long id,
                                         @RequestBody @Valid MemberLevelConfigVO.SaveReqVO reqVO) {
         memberLevelConfigService.updateLevel(id, reqVO);
@@ -48,7 +48,7 @@ public class MemberLevelConfigController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除会员等级")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:delete')")
     public CommonResult<Boolean> delete(@RequestParam("id") Long id) {
         memberLevelConfigService.deleteLevel(id);
         return success(true);
@@ -56,7 +56,7 @@ public class MemberLevelConfigController {
 
     @GetMapping("/page")
     @Operation(summary = "会员等级分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:query')")
     public CommonResult<PageResult<MemberLevelConfigVO.RespVO>> page(
             @Valid MemberLevelConfigVO.PageReqVO pageReqVO) {
         return success(memberLevelConfigService.getLevelPage(pageReqVO));
@@ -64,14 +64,14 @@ public class MemberLevelConfigController {
 
     @GetMapping("/enabled-list")
     @Operation(summary = "已启用的会员等级列表")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:query')")
     public CommonResult<List<MemberLevelConfigVO.RespVO>> enabledList() {
         return success(memberLevelConfigService.getEnabledLevels());
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得会员等级（编辑回填）")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-level:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-level:query')")
     public CommonResult<MemberLevelConfigVO.RespVO> getLevel(@RequestParam("id") Long id) {
         return success(memberLevelConfigService.getLevel(id));
     }

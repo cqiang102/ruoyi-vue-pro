@@ -331,6 +331,8 @@ yudao:
       - /admin-api/system/user/profile/**
       - /admin-api/system/auth/**
     ignore-tables:
+      - restaurant_package # 平台级套餐配置（BaseDO，无 tenant_id 列）
+      - restaurant_invoice_title # 会员发票抬头（BaseDO，无 tenant_id 列）
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

@@ -26,14 +26,14 @@ public class MemberCardController {
 
     @PostMapping("/create")
     @Operation(summary = "创建会员卡")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-card:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-card:create')")
     public CommonResult<Long> createCard(@RequestBody @Valid MemberCardVO.SaveReqVO createReqVO) {
         return success(memberCardService.createCard(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新会员卡")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-card:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-card:update')")
     public CommonResult<Boolean> updateCard(@RequestBody @Valid MemberCardVO.SaveReqVO updateReqVO) {
         memberCardService.updateCard(updateReqVO);
         return success(true);
@@ -41,7 +41,7 @@ public class MemberCardController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除会员卡")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-card:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-card:delete')")
     public CommonResult<Boolean> deleteCard(@RequestParam("id") Long id) {
         memberCardService.deleteCard(id);
         return success(true);
@@ -49,14 +49,14 @@ public class MemberCardController {
 
     @GetMapping("/page")
     @Operation(summary = "获得会员卡分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-card:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-card:query')")
     public CommonResult<PageResult<MemberCardVO.RespVO>> getCardPage(@Valid MemberCardVO.PageReqVO pageReqVO) {
         return success(memberCardService.getCardPage(pageReqVO));
     }
 
     @GetMapping("/order-page")
     @Operation(summary = "获得购卡记录分页（客服排查）")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-card:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-card:query')")
     public CommonResult<PageResult<MemberCardVO.OrderRespVO>> getOrderPage(
             @Valid MemberCardVO.OrderPageReqVO pageReqVO) {
         return success(memberCardService.getOrderPage(pageReqVO));

@@ -32,14 +32,14 @@ public class DishCategoryController {
 
     @PostMapping("/create")
     @Operation(summary = "创建菜品分类")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:create')")
     public CommonResult<Long> createDishCategory(@RequestBody @Valid DishCategoryVO.SaveReqVO createReqVO) {
         return success(dishCategoryService.createDishCategory(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新菜品分类")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:update')")
     public CommonResult<Boolean> updateDishCategory(@RequestBody @Valid DishCategoryVO.SaveReqVO updateReqVO) {
         dishCategoryService.updateDishCategory(updateReqVO);
         return success(true);
@@ -47,7 +47,7 @@ public class DishCategoryController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜品分类")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:delete')")
     public CommonResult<Boolean> deleteDishCategory(@RequestParam("id") Long id) {
         dishCategoryService.deleteDishCategory(id);
         return success(true);
@@ -55,14 +55,14 @@ public class DishCategoryController {
 
     @GetMapping("/get")
     @Operation(summary = "获得菜品分类")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:query')")
     public CommonResult<DishCategoryVO.RespVO> getDishCategory(@RequestParam("id") Long id) {
         return success(dishCategoryService.getDishCategory(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "菜品分类分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:query')")
     public CommonResult<PageResult<DishCategoryVO.RespVO>> getDishCategoryPage(
             @Validated DishCategoryVO.PageReqVO pageReqVO) {
         return success(dishCategoryService.getDishCategoryPage(pageReqVO));
@@ -70,7 +70,7 @@ public class DishCategoryController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得菜品分类精简列表（下拉用）")
-    @PreAuthorize("hasAnyAuthority('restaurant:dish-category:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:dish-category:query')")
     public CommonResult<List<DishCategoryVO.RespVO>> getSimpleList() {
         return success(dishCategoryService.getDishCategorySimpleList());
     }

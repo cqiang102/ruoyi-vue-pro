@@ -34,7 +34,7 @@ public class StatisticsController {
 
     @GetMapping("/dashboard")
     @Operation(summary = "看板聚合数据（概览 + 趋势 + 类型分布 + 菜品 TOP）")
-    @PreAuthorize("hasAnyAuthority('restaurant:statistics:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:statistics:query')")
     public CommonResult<StatisticsVO.DashboardRespVO> getDashboard() {
         return success(statisticsService.getDashboard(storeAuthService.getLoginUserStoreId()));
     }

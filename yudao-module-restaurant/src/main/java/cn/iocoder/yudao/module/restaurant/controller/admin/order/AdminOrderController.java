@@ -30,7 +30,7 @@ public class AdminOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建订单（门店/收银协助点餐）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:create')")
     public CommonResult<Long> createOrder(@RequestBody @Valid OrderVO.CreateReqVO createReqVO) {
         // P1-A：门店端创建订单时强制以登录账号绑定的门店为准，
         // 忽略前端传入的 storeId，杜绝跨门店代客下单
@@ -41,7 +41,7 @@ public class AdminOrderController {
 
     @PostMapping("/add-items")
     @Operation(summary = "加菜（往已存在订单追加明细）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:add-items')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:add-items')")
     public CommonResult<Boolean> addOrderItems(@RequestParam("orderId") Long orderId,
                                                @RequestBody @Valid List<OrderVO.ItemCreateVO> items) {
         // P1-A：校验订单归属当前门店，杜绝跨门店加菜
@@ -52,7 +52,7 @@ public class AdminOrderController {
 
     @PutMapping("/cancel")
     @Operation(summary = "取消订单（仅待支付）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:cancel')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:cancel')")
     public CommonResult<Boolean> cancelOrder(@RequestParam("id") Long id) {
         // P1-A：校验订单归属
         storeAuthService.validateOrderOwnership(id);
@@ -62,7 +62,7 @@ public class AdminOrderController {
 
     @PutMapping("/accept")
     @Operation(summary = "接单（已支付 → 制作中）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:accept')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:accept')")
     public CommonResult<Boolean> acceptOrder(@RequestParam("id") Long id) {
         // P1-A：校验订单归属
         storeAuthService.validateOrderOwnership(id);
@@ -72,7 +72,7 @@ public class AdminOrderController {
 
     @PutMapping("/complete")
     @Operation(summary = "完成订单（制作中 → 已完成）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:complete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:complete')")
     public CommonResult<Boolean> completeOrder(@RequestParam("id") Long id) {
         // P1-A：校验订单归属
         storeAuthService.validateOrderOwnership(id);
@@ -82,7 +82,7 @@ public class AdminOrderController {
 
     @PostMapping("/verify")
     @Operation(summary = "扫码核销（门店端凭核销码完成订单，自动释放堂食桌台）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:verify')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:verify')")
     public CommonResult<Boolean> verifyOrder(@RequestParam("verifyCode") String verifyCode,
                                              @RequestParam(value = "storeId", required = false) Long storeId) {
         // P1-A：核销场景 verifyCode 是全局唯一键，storeId 仅辅助校验；
@@ -95,7 +95,7 @@ public class AdminOrderController {
 
     @PostMapping("/call")
     @Operation(summary = "叫号（记录叫号时间，便于展示已叫状态）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:call')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:call')")
     public CommonResult<Boolean> callOrder(@RequestParam("id") Long id) {
         // P1-A：校验订单归属
         storeAuthService.validateOrderOwnership(id);
@@ -105,7 +105,7 @@ public class AdminOrderController {
 
     @GetMapping("/get")
     @Operation(summary = "获得订单（含明细）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:query')")
     public CommonResult<OrderVO.RespVO> getOrder(@RequestParam("id") Long id) {
         // P1-A：校验订单归属——门店端查看订单明细不能跨店
         storeAuthService.validateOrderOwnership(id);
@@ -114,7 +114,7 @@ public class AdminOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得订单分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:query')")
     public CommonResult<PageResult<OrderVO.RespVO>> getOrderPage(@Valid OrderVO.PageReqVO pageReqVO) {
         // P1-A：门店端订单分页强制注入登录账号绑定的门店编号，
         // 忽略前端传入的 storeId，杜绝跨门店订单列表越权查看
@@ -125,7 +125,7 @@ public class AdminOrderController {
 
     @PutMapping("/pay-cash")
     @Operation(summary = "现金收讫（收银台 M-04：待支付 → 已支付，无支付单）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:pay-cash')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:pay-cash')")
     public CommonResult<Boolean> payOrderByCash(@RequestParam("id") Long id) {
         // P1-A：校验订单归属——门店端只能给本店订单收银，杜绝跨店收款
         storeAuthService.validateOrderOwnership(id);
@@ -135,7 +135,7 @@ public class AdminOrderController {
 
     @PutMapping("/refund")
     @Operation(summary = "退款（门店/商家发起，原路退回）")
-    @PreAuthorize("hasAnyAuthority('restaurant:order:refund')")
+    @PreAuthorize("@ss.hasPermission('restaurant:order:refund')")
     public CommonResult<Boolean> refundOrder(@RequestParam("id") Long id,
                                              @RequestParam(value = "reason", required = false) String reason) {
         // P1-A：校验订单归属——门店端只能退本店订单，杜绝跨店退款

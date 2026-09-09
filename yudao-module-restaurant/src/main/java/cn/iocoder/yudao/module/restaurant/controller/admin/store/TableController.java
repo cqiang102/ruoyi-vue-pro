@@ -27,14 +27,14 @@ public class TableController {
 
     @PostMapping("/create")
     @Operation(summary = "创建桌台")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:create')")
     public CommonResult<Long> createTable(@RequestBody @Valid TableVO.SaveReqVO createReqVO) {
         return success(tableService.createTable(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新桌台")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:update')")
     public CommonResult<Boolean> updateTable(@RequestBody @Valid TableVO.SaveReqVO updateReqVO) {
         tableService.updateTable(updateReqVO);
         return success(true);
@@ -42,7 +42,7 @@ public class TableController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除桌台")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:delete')")
     public CommonResult<Boolean> deleteTable(@RequestParam("id") Long id) {
         tableService.deleteTable(id);
         return success(true);
@@ -50,7 +50,7 @@ public class TableController {
 
     @PostMapping("/generate")
     @Operation(summary = "批量生成桌台")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:create')")
     public CommonResult<Boolean> generateTables(@RequestBody @Valid TableVO.BatchSaveReqVO batchReqVO) {
         tableService.generateTables(batchReqVO);
         return success(true);
@@ -58,21 +58,21 @@ public class TableController {
 
     @GetMapping("/get")
     @Operation(summary = "获得桌台")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:query')")
     public CommonResult<TableVO.RespVO> getTable(@RequestParam("id") Long id) {
         return success(tableService.getTable(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得桌台分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:query')")
     public CommonResult<PageResult<TableVO.RespVO>> getTablePage(@Valid TableVO.PageReqVO pageReqVO) {
         return success(tableService.getTablePage(pageReqVO));
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得门店下全部桌台（点餐/下单用）")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:query')")
     public CommonResult<List<TableVO.RespVO>> getTableSimpleList(
             @RequestParam(value = "storeId", required = false) Long storeId) {
         return success(tableService.getTableSimpleList(storeId));
@@ -80,7 +80,7 @@ public class TableController {
 
     @PostMapping("/regenerate-qrcode")
     @Operation(summary = "重新生成落座桌码（可指定 H5 前缀）")
-    @PreAuthorize("hasAnyAuthority('restaurant:table:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:table:update')")
     public CommonResult<String> regenerateQrcode(
             @RequestParam("id") Long id,
             @RequestParam(value = "baseUrl", required = false) String baseUrl) {

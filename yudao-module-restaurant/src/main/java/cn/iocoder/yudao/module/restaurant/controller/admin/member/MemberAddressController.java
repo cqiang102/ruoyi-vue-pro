@@ -26,7 +26,7 @@ public class MemberAddressController {
 
     @GetMapping("/page")
     @Operation(summary = "获得会员地址分页（按 userId 过滤，客服排查用）")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-address:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-address:query')")
     public CommonResult<PageResult<MemberAddressVO.RespVO>> getAddressPage(
             @Valid MemberAddressVO.PageReqVO pageReqVO) {
         return success(memberAddressService.getAddressPage(pageReqVO));
@@ -34,7 +34,7 @@ public class MemberAddressController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除会员地址")
-    @PreAuthorize("hasAnyAuthority('restaurant:member-address:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:member-address:delete')")
     public CommonResult<Boolean> deleteAddress(@RequestParam("id") Long id) {
         memberAddressService.deleteAddressByAdmin(id);
         return success(true);

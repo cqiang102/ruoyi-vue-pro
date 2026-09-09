@@ -27,14 +27,14 @@ public class StoreController {
 
     @PostMapping("/create")
     @Operation(summary = "创建门店")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:create')")
     public CommonResult<Long> createStore(@RequestBody @Valid StoreVO.SaveReqVO createReqVO) {
         return success(storeService.createStore(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新门店")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:update')")
     public CommonResult<Boolean> updateStore(@RequestBody @Valid StoreVO.SaveReqVO updateReqVO) {
         storeService.updateStore(updateReqVO);
         return success(true);
@@ -42,7 +42,7 @@ public class StoreController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除门店")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:delete')")
     public CommonResult<Boolean> deleteStore(@RequestParam("id") Long id) {
         storeService.deleteStore(id);
         return success(true);
@@ -50,21 +50,21 @@ public class StoreController {
 
     @GetMapping("/get")
     @Operation(summary = "获得门店")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:query')")
     public CommonResult<StoreVO.RespVO> getStore(@RequestParam("id") Long id) {
         return success(storeService.getStore(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得门店分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:query')")
     public CommonResult<PageResult<StoreVO.RespVO>> getStorePage(@Valid StoreVO.PageReqVO pageReqVO) {
         return success(storeService.getStorePage(pageReqVO));
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得门店精简列表（下拉用）")
-    @PreAuthorize("hasAnyAuthority('restaurant:store:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:store:query')")
     public CommonResult<List<StoreVO.RespVO>> getStoreSimpleList() {
         return success(storeService.getStoreSimpleList());
     }

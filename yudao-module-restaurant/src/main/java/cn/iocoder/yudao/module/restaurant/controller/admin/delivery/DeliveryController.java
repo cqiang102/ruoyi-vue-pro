@@ -39,14 +39,14 @@ public class DeliveryController {
 
     @GetMapping("/config")
     @Operation(summary = "获取门店配送配置（无配置返回空）")
-    @PreAuthorize("hasAnyAuthority('restaurant:delivery:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:delivery:query')")
     public CommonResult<DeliveryVO.ConfigRespVO> getConfig() {
         return success(deliveryService.getConfig(storeAuthService.getLoginUserStoreId()));
     }
 
     @PutMapping("/config")
     @Operation(summary = "保存门店配送配置（一店一条 upsert）")
-    @PreAuthorize("hasAnyAuthority('restaurant:delivery:config')")
+    @PreAuthorize("@ss.hasPermission('restaurant:delivery:config')")
     public CommonResult<Boolean> saveConfig(@Valid @RequestBody DeliveryVO.ConfigSaveReqVO reqVO) {
         deliveryService.saveConfig(reqVO, storeAuthService.getLoginUserStoreId());
         return success(true);
@@ -54,7 +54,7 @@ public class DeliveryController {
 
     @GetMapping("/page")
     @Operation(summary = "运单分页（本店隔离）")
-    @PreAuthorize("hasAnyAuthority('restaurant:delivery:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:delivery:query')")
     public CommonResult<PageResult<DeliveryVO.RespVO>> getDeliveryPage(
             @RequestParam(value = "status", required = false) Integer status,
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
@@ -72,14 +72,14 @@ public class DeliveryController {
 
     @PostMapping("/send")
     @Operation(summary = "发单（外卖订单 → 达达快送）")
-    @PreAuthorize("hasAnyAuthority('restaurant:delivery:send')")
+    @PreAuthorize("@ss.hasPermission('restaurant:delivery:send')")
     public CommonResult<Long> sendDelivery(@RequestParam("orderId") Long orderId) {
         return success(deliveryService.sendDelivery(orderId, storeAuthService.getLoginUserStoreId()));
     }
 
     @PutMapping("/cancel")
     @Operation(summary = "商家取消运单")
-    @PreAuthorize("hasAnyAuthority('restaurant:delivery:cancel')")
+    @PreAuthorize("@ss.hasPermission('restaurant:delivery:cancel')")
     public CommonResult<Boolean> cancelDelivery(@RequestParam("orderId") Long orderId) {
         deliveryService.cancelDelivery(orderId, storeAuthService.getLoginUserStoreId());
         return success(true);

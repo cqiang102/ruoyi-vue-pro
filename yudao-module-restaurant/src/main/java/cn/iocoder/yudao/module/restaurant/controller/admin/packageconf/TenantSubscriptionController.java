@@ -26,14 +26,14 @@ public class TenantSubscriptionController {
 
     @PostMapping("/open")
     @Operation(summary = "开通/续费租户订阅（自动初始化默认商户数据）")
-    @PreAuthorize("hasAnyAuthority('restaurant:subscription:open')")
+    @PreAuthorize("@ss.hasPermission('restaurant:subscription:open')")
     public CommonResult<Long> openSubscription(@RequestBody @Valid TenantSubscriptionVO.OpenReqVO reqVO) {
         return success(tenantSubscriptionService.openSubscription(reqVO));
     }
 
     @GetMapping("/page")
     @Operation(summary = "租户订阅分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:subscription:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:subscription:query')")
     public CommonResult<PageResult<TenantSubscriptionVO.RespVO>> getSubscriptionPage(
             @Validated TenantSubscriptionVO.PageReqVO pageReqVO) {
         return success(tenantSubscriptionService.getSubscriptionPage(pageReqVO));

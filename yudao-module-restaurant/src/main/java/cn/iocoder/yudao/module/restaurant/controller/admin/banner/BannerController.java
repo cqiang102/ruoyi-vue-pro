@@ -26,14 +26,14 @@ public class BannerController {
 
     @PostMapping("/create")
     @Operation(summary = "创建轮播图")
-    @PreAuthorize("hasAnyAuthority('restaurant:banner:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:banner:create')")
     public CommonResult<Long> createBanner(@RequestBody @Valid BannerVO.SaveReqVO createReqVO) {
         return success(bannerService.createBanner(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新轮播图")
-    @PreAuthorize("hasAnyAuthority('restaurant:banner:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:banner:update')")
     public CommonResult<Boolean> updateBanner(@RequestBody @Valid BannerVO.SaveReqVO updateReqVO) {
         bannerService.updateBanner(updateReqVO);
         return success(true);
@@ -41,7 +41,7 @@ public class BannerController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除轮播图")
-    @PreAuthorize("hasAnyAuthority('restaurant:banner:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:banner:delete')")
     public CommonResult<Boolean> deleteBanner(@RequestParam("id") Long id) {
         bannerService.deleteBanner(id);
         return success(true);
@@ -49,14 +49,14 @@ public class BannerController {
 
     @GetMapping("/get")
     @Operation(summary = "获得轮播图")
-    @PreAuthorize("hasAnyAuthority('restaurant:banner:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:banner:query')")
     public CommonResult<BannerVO.RespVO> getBanner(@RequestParam("id") Long id) {
         return success(bannerService.getBanner(id));
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得轮播图分页")
-    @PreAuthorize("hasAnyAuthority('restaurant:banner:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:banner:query')")
     public CommonResult<PageResult<BannerVO.RespVO>> getBannerPage(@Valid BannerVO.PageReqVO pageReqVO) {
         return success(bannerService.getBannerPage(pageReqVO));
     }

@@ -39,7 +39,7 @@ public class PrinterController {
 
     @PostMapping("/create")
     @Operation(summary = "添加打印机（终端号）")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:create')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:create')")
     public CommonResult<Long> createPrinter(@RequestBody @Valid PrinterVO.SaveReqVO saveReqVO) {
         // P1-A：强制绑定登录店员的门店，杜绝跨店绑定设备
         return success(printerService.createPrinter(saveReqVO, storeAuthService.getLoginUserStoreId()));
@@ -47,7 +47,7 @@ public class PrinterController {
 
     @PutMapping("/update")
     @Operation(summary = "更新打印机")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:update')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:update')")
     public CommonResult<Boolean> updatePrinter(@RequestBody @Valid PrinterVO.SaveReqVO saveReqVO) {
         printerService.updatePrinter(saveReqVO, storeAuthService.getLoginUserStoreId());
         return success(true);
@@ -55,7 +55,7 @@ public class PrinterController {
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除打印机")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:delete')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:delete')")
     public CommonResult<Boolean> deletePrinter(@RequestParam("id") Long id) {
         printerService.deletePrinter(id, storeAuthService.getLoginUserStoreId());
         return success(true);
@@ -63,7 +63,7 @@ public class PrinterController {
 
     @GetMapping("/page")
     @Operation(summary = "打印机分页（本店）")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:query')")
     public CommonResult<PageResult<PrinterVO.RespVO>> getPrinterPage(@Valid PrinterVO.PageReqVO pageReqVO) {
         // P1-A：强制本店过滤
         pageReqVO.setStoreId(storeAuthService.getLoginUserStoreId());
@@ -73,7 +73,7 @@ public class PrinterController {
 
     @GetMapping("/task-page")
     @Operation(summary = "打印任务分页（本店，含失败重试入口）")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:query')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:query')")
     public CommonResult<PageResult<PrinterVO.TaskRespVO>> getTaskPage(
             @RequestParam(value = "orderId", required = false) Long orderId,
             @RequestParam(value = "status", required = false) Integer status,
@@ -102,7 +102,7 @@ public class PrinterController {
 
     @PutMapping("/task/retry")
     @Operation(summary = "重试失败打印任务")
-    @PreAuthorize("hasAnyAuthority('restaurant:printer:retry')")
+    @PreAuthorize("@ss.hasPermission('restaurant:printer:retry')")
     public CommonResult<Boolean> retryTask(@RequestParam("id") Long id) {
         // P1-A：归属校验内聚在 service（任务 storeId 与登录门店比对）
         printService.retryTask(id, storeAuthService.getLoginUserStoreId());
