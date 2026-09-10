@@ -214,6 +214,14 @@ public class PayWalletServiceImpl implements PayWalletService {
                 case TRANSFER: // 分佣提现
                     walletMapper.updateWhenAdd(payWallet.getId(), price);
                     break;
+                case PAYMENT: { // 消费支付：调用方传入负数 price，取反得到实际消费金额
+                    // 走 updateWhenConsumption：balance - 金额 / total_expense + 金额，且带 CAS 守卫
+                    int updateCounts = walletMapper.updateWhenConsumption(payWallet.getId(), -price);
+                    if (updateCounts == 0) { // CAS 未命中：余额不足
+                        throw exception(WALLET_BALANCE_NOT_ENOUGH);
+                    }
+                    break;
+                }
                 default: {
                     throw new UnsupportedOperationException("待实现：" + bizType);
                 }
