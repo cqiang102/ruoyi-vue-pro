@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.restaurant.convert.member;
 
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberAddressVO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberAddressDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.RestaurantMemberAddressDO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class MemberAddressConvert {
 
-    public static MemberAddressVO.RespVO convert(MemberAddressDO bean) {
+    public static MemberAddressVO.RespVO convert(RestaurantMemberAddressDO bean) {
         if (bean == null) {
             return null;
         }
@@ -29,21 +29,21 @@ public class MemberAddressConvert {
         return respVO;
     }
 
-    public static List<MemberAddressVO.RespVO> convertList(List<MemberAddressDO> list) {
+    public static List<MemberAddressVO.RespVO> convertList(List<RestaurantMemberAddressDO> list) {
         List<MemberAddressVO.RespVO> result = new ArrayList<>();
         if (list != null) {
-            for (MemberAddressDO item : list) {
+            for (RestaurantMemberAddressDO item : list) {
                 result.add(convert(item));
             }
         }
         return result;
     }
 
-    public static MemberAddressDO convert(MemberAddressVO.SaveReqVO bean) {
+    public static RestaurantMemberAddressDO convert(MemberAddressVO.SaveReqVO bean) {
         if (bean == null) {
             return null;
         }
-        MemberAddressDO addressDO = new MemberAddressDO();
+        RestaurantMemberAddressDO addressDO = new RestaurantMemberAddressDO();
         addressDO.setId(bean.getId());
         addressDO.setName(bean.getName());
         addressDO.setPhone(bean.getPhone());

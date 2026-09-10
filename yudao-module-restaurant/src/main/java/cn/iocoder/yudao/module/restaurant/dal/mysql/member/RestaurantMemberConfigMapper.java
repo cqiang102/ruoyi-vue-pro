@@ -1,15 +1,15 @@
 package cn.iocoder.yudao.module.restaurant.dal.mysql.member;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberAddressDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.RestaurantMemberConfigDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 会员收货地址 Mapper
+ * 会员营销配置 Mapper
  *
  * @author 餐饮 SaaS
  */
 @Mapper
-public interface MemberAddressMapper extends BaseMapperX<MemberAddressDO> {
+public interface RestaurantMemberConfigMapper extends BaseMapperX<RestaurantMemberConfigDO> {
 
 }

@@ -17,7 +17,9 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "消费者小程序 - 会员收货地址")
 @RestController
-@RequestMapping("/member/address")
+// 换命名空间：/member/address 已被 yudao-module-member 的 AppAddressController 占用
+// （list/create/update/get/delete），故餐饮侧地址接口统一挂到 restaurant-address
+@RequestMapping("/member/restaurant-address")
 @Validated
 public class AppMemberAddressController {
 

@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberAddressVO;
 import cn.iocoder.yudao.module.restaurant.convert.member.MemberAddressConvert;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberAddressDO;
-import cn.iocoder.yudao.module.restaurant.dal.mysql.member.MemberAddressMapper;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.RestaurantMemberAddressDO;
+import cn.iocoder.yudao.module.restaurant.dal.mysql.member.RestaurantMemberAddressMapper;
 import cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,22 +35,22 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     private static final long ADDRESS_COUNT_LIMIT = 20;
 
     @Resource
-    private MemberAddressMapper memberAddressMapper;
+    private RestaurantMemberAddressMapper restaurantMemberAddressMapper;
 
     @Override
     public Long createAddress(Long userId, MemberAddressVO.SaveReqVO createReqVO) {
-        long count = memberAddressMapper.selectCount(MemberAddressDO::getUserId, userId);
+        long count = restaurantMemberAddressMapper.selectCount(RestaurantMemberAddressDO::getUserId, userId);
         if (count >= ADDRESS_COUNT_LIMIT) {
             throw new ServiceException(ErrorCodeConstants.MEMBER_ADDRESS_COUNT_LIMIT);
         }
-        MemberAddressDO address = MemberAddressConvert.convert(createReqVO);
+        RestaurantMemberAddressDO address = MemberAddressConvert.convert(createReqVO);
         address.setId(null); // 防止前端回传 id 造成误更新
         address.setUserId(userId);
         // 第一条地址强制默认；后续显式设默认的，同样清掉其它默认
         if (count == 0 || Integer.valueOf(1).equals(address.getDefaultStatus())) {
             address.setDefaultStatus(1);
         }
-        memberAddressMapper.insert(address);
+        restaurantMemberAddressMapper.insert(address);
         if (Integer.valueOf(1).equals(address.getDefaultStatus())) {
             clearOtherDefaults(userId, address.getId());
         }
@@ -59,10 +59,10 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
     @Override
     public void updateAddress(Long userId, MemberAddressVO.SaveReqVO updateReqVO) {
-        MemberAddressDO existing = validateAddressOwnedBy(userId, updateReqVO.getId());
-        MemberAddressDO updateObj = MemberAddressConvert.convert(updateReqVO);
+        RestaurantMemberAddressDO existing = validateAddressOwnedBy(userId, updateReqVO.getId());
+        RestaurantMemberAddressDO updateObj = MemberAddressConvert.convert(updateReqVO);
         updateObj.setUserId(existing.getUserId()); // 归属不可被改写
-        memberAddressMapper.updateById(updateObj);
+        restaurantMemberAddressMapper.updateById(updateObj);
         if (Integer.valueOf(1).equals(updateObj.getDefaultStatus())) {
             clearOtherDefaults(userId, updateObj.getId());
         }
@@ -71,7 +71,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     @Override
     public void deleteAddress(Long userId, Long id) {
         validateAddressOwnedBy(userId, id);
-        memberAddressMapper.deleteById(id);
+        restaurantMemberAddressMapper.deleteById(id);
     }
 
     @Override
@@ -79,69 +79,69 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public void setDefaultAddress(Long userId, Long id) {
         validateAddressOwnedBy(userId, id);
         clearOtherDefaults(userId, id);
-        MemberAddressDO update = new MemberAddressDO();
+        RestaurantMemberAddressDO update = new RestaurantMemberAddressDO();
         update.setId(id);
         update.setDefaultStatus(1);
-        memberAddressMapper.updateById(update);
+        restaurantMemberAddressMapper.updateById(update);
     }
 
     @Override
     public List<MemberAddressVO.RespVO> getAddressList(Long userId) {
-        List<MemberAddressDO> list = memberAddressMapper.selectList(
-                new LambdaQueryWrapperX<MemberAddressDO>()
-                        .eq(MemberAddressDO::getUserId, userId)
-                        .orderByDesc(MemberAddressDO::getDefaultStatus)
-                        .orderByDesc(MemberAddressDO::getId));
+        List<RestaurantMemberAddressDO> list = restaurantMemberAddressMapper.selectList(
+                new LambdaQueryWrapperX<RestaurantMemberAddressDO>()
+                        .eq(RestaurantMemberAddressDO::getUserId, userId)
+                        .orderByDesc(RestaurantMemberAddressDO::getDefaultStatus)
+                        .orderByDesc(RestaurantMemberAddressDO::getId));
         return MemberAddressConvert.convertList(list);
     }
 
     @Override
     public PageResult<MemberAddressVO.RespVO> getAddressPage(MemberAddressVO.PageReqVO pageReqVO) {
-        PageResult<MemberAddressDO> page = memberAddressMapper.selectPage(pageReqVO,
-                new LambdaQueryWrapperX<MemberAddressDO>()
-                        .eqIfPresent(MemberAddressDO::getUserId, pageReqVO.getUserId())
-                        .orderByDesc(MemberAddressDO::getId));
+        PageResult<RestaurantMemberAddressDO> page = restaurantMemberAddressMapper.selectPage(pageReqVO,
+                new LambdaQueryWrapperX<RestaurantMemberAddressDO>()
+                        .eqIfPresent(RestaurantMemberAddressDO::getUserId, pageReqVO.getUserId())
+                        .orderByDesc(RestaurantMemberAddressDO::getId));
         return new PageResult<>(MemberAddressConvert.convertList(page.getList()), page.getTotal());
     }
 
     @Override
     public void deleteAddressByAdmin(Long id) {
         validateAddressExists(id);
-        memberAddressMapper.deleteById(id);
+        restaurantMemberAddressMapper.deleteById(id);
     }
 
     // ========== 辅助 ==========
 
     private void clearOtherDefaults(Long userId, Long excludeId) {
-        List<MemberAddressDO> defaults = memberAddressMapper.selectList(
-                new LambdaQueryWrapperX<MemberAddressDO>()
-                        .eq(MemberAddressDO::getUserId, userId)
-                        .eq(MemberAddressDO::getDefaultStatus, 1)
-                        .ne(MemberAddressDO::getId, excludeId));
+        List<RestaurantMemberAddressDO> defaults = restaurantMemberAddressMapper.selectList(
+                new LambdaQueryWrapperX<RestaurantMemberAddressDO>()
+                        .eq(RestaurantMemberAddressDO::getUserId, userId)
+                        .eq(RestaurantMemberAddressDO::getDefaultStatus, 1)
+                        .ne(RestaurantMemberAddressDO::getId, excludeId));
         if (defaults.isEmpty()) {
             return;
         }
-        memberAddressMapper.updateById(convertList(defaults, addr -> {
-            MemberAddressDO update = new MemberAddressDO();
+        restaurantMemberAddressMapper.updateById(convertList(defaults, addr -> {
+            RestaurantMemberAddressDO update = new RestaurantMemberAddressDO();
             update.setId(addr.getId());
             update.setDefaultStatus(0);
             return update;
         }));
     }
 
-    private MemberAddressDO validateAddressExists(Long id) {
+    private RestaurantMemberAddressDO validateAddressExists(Long id) {
         if (id == null) {
             throw new ServiceException(ErrorCodeConstants.MEMBER_ADDRESS_NOT_EXISTS);
         }
-        MemberAddressDO address = memberAddressMapper.selectById(id);
+        RestaurantMemberAddressDO address = restaurantMemberAddressMapper.selectById(id);
         if (address == null) {
             throw new ServiceException(ErrorCodeConstants.MEMBER_ADDRESS_NOT_EXISTS);
         }
         return address;
     }
 
-    private MemberAddressDO validateAddressOwnedBy(Long userId, Long id) {
-        MemberAddressDO address = validateAddressExists(id);
+    private RestaurantMemberAddressDO validateAddressOwnedBy(Long userId, Long id) {
+        RestaurantMemberAddressDO address = validateAddressExists(id);
         if (!address.getUserId().equals(userId)) {
             throw new ServiceException(ErrorCodeConstants.MEMBER_ADDRESS_NOT_OWNER);
         }

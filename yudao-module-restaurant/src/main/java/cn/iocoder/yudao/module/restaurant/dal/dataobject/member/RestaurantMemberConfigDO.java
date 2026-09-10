@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @TableName("restaurant_member_config")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MemberConfigDO extends TenantBaseDO {
+public class RestaurantMemberConfigDO extends TenantBaseDO {
 
     /**
      * 配置编号

@@ -347,6 +347,18 @@ yudao:
       - pay_demo_withdraw
       - pay_demo_order
       # 注：pay_channel / pay_notify_task 为 TenantBaseDO（自带 tenant_id），不在此列
+      # 会员模块：以下 10 张表 extends BaseDO（无 tenant_id 列），租户拦截器跳过
+      # 注：member_user 为 TenantBaseDO（自带 tenant_id），不在此列
+      - member_config
+      - member_group
+      - member_point_record
+      - member_sign_in_config
+      - member_sign_in_record
+      - member_address
+      - member_experience_record
+      - member_level
+      - member_level_record
+      - member_tag
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

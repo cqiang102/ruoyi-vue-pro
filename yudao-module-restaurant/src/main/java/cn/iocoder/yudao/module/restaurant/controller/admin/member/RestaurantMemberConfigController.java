@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.restaurant.controller.admin.member;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberConfigVO;
-import cn.iocoder.yudao.module.restaurant.service.member.MemberConfigService;
+import cn.iocoder.yudao.module.restaurant.service.member.RestaurantMemberConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +23,10 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/store/member-config")
 @Validated
-public class MemberConfigController {
+public class RestaurantMemberConfigController {
 
     @Resource
-    private MemberConfigService memberConfigService;
+    private RestaurantMemberConfigService memberConfigService;
 
     @GetMapping("/get")
     @Operation(summary = "获取当前租户会员营销配置")

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.restaurant.service.member;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberConfigVO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberConfigDO;
-import cn.iocoder.yudao.module.restaurant.dal.mysql.member.MemberConfigMapper;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.RestaurantMemberConfigDO;
+import cn.iocoder.yudao.module.restaurant.dal.mysql.member.RestaurantMemberConfigMapper;
 import cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -19,14 +19,14 @@ import java.util.List;
  */
 @Service
 @Validated
-public class MemberConfigServiceImpl implements MemberConfigService {
+public class RestaurantMemberConfigServiceImpl implements RestaurantMemberConfigService {
 
     @Resource
-    private MemberConfigMapper memberConfigMapper;
+    private RestaurantMemberConfigMapper restaurantMemberConfigMapper;
 
     @Override
     public MemberConfigVO.RespVO getConfig() {
-        MemberConfigDO config = getOrInitConfig();
+        RestaurantMemberConfigDO config = getOrInitConfig();
         return new MemberConfigVO.RespVO()
                 .setId(config.getId())
                 .setEarnPerYuan(config.getEarnPerYuan())
@@ -41,16 +41,16 @@ public class MemberConfigServiceImpl implements MemberConfigService {
 
     @Override
     public void saveConfig(MemberConfigVO.SaveReqVO reqVO) {
-        MemberConfigDO exist = getCurrentTenantConfig();
+        RestaurantMemberConfigDO exist = getCurrentTenantConfig();
         if (exist == null) {
-            MemberConfigDO config = new MemberConfigDO()
+            RestaurantMemberConfigDO config = new RestaurantMemberConfigDO()
                     .setEarnPerYuan(reqVO.getEarnPerYuan())
                     .setDeductPerPoint(reqVO.getDeductPerPoint())
                     .setMinDeductAmount(reqVO.getMinDeductAmount())
                     .setMaxDeductRate(reqVO.getMaxDeductRate())
                     .setLevelUpMode(reqVO.getLevelUpMode())
                     .setStatus(reqVO.getStatus());
-            memberConfigMapper.insert(config);
+            restaurantMemberConfigMapper.insert(config);
         } else {
             exist.setEarnPerYuan(reqVO.getEarnPerYuan())
                     .setDeductPerPoint(reqVO.getDeductPerPoint())
@@ -58,28 +58,28 @@ public class MemberConfigServiceImpl implements MemberConfigService {
                     .setMaxDeductRate(reqVO.getMaxDeductRate())
                     .setLevelUpMode(reqVO.getLevelUpMode())
                     .setStatus(reqVO.getStatus());
-            memberConfigMapper.updateById(exist);
+            restaurantMemberConfigMapper.updateById(exist);
         }
     }
 
     @Override
-    public MemberConfigDO getOrInitConfig() {
-        MemberConfigDO config = getCurrentTenantConfig();
+    public RestaurantMemberConfigDO getOrInitConfig() {
+        RestaurantMemberConfigDO config = getCurrentTenantConfig();
         if (config == null) {
-            config = new MemberConfigDO()
+            config = new RestaurantMemberConfigDO()
                     .setEarnPerYuan(1)
                     .setDeductPerPoint(10)
                     .setMinDeductAmount(0)
                     .setMaxDeductRate(50)
                     .setLevelUpMode(0)
                     .setStatus(1);
-            memberConfigMapper.insert(config);
+            restaurantMemberConfigMapper.insert(config);
         }
         return config;
     }
 
-    private MemberConfigDO getCurrentTenantConfig() {
-        List<MemberConfigDO> list = memberConfigMapper.selectList(new LambdaQueryWrapperX<>());
+    private RestaurantMemberConfigDO getCurrentTenantConfig() {
+        List<RestaurantMemberConfigDO> list = restaurantMemberConfigMapper.selectList(new LambdaQueryWrapperX<>());
         if (list.isEmpty()) {
             return null;
         }

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.restaurant.controller.admin.member.vo.MemberVO;
-import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberConfigDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.RestaurantMemberConfigDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.member.MemberLevelConfigDO;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.member.MemberLevelConfigMapper;
@@ -27,7 +27,7 @@ import java.util.List;
 public class RestaurantMemberServiceImpl extends ServiceImpl<MemberMapper, MemberDO> implements RestaurantMemberService {
 
     @Resource
-    private MemberConfigService memberConfigService;
+    private RestaurantMemberConfigService memberConfigService;
     @Resource
     private MemberLevelConfigMapper memberLevelConfigMapper;
     @Resource
@@ -131,7 +131,7 @@ public class RestaurantMemberServiceImpl extends ServiceImpl<MemberMapper, Membe
         if (getById(memberId) == null) {
             return; // 尚未建档的散客，忽略消费升级
         }
-        MemberConfigDO config = memberConfigService.getOrInitConfig();
+        RestaurantMemberConfigDO config = memberConfigService.getOrInitConfig();
         int earnPerYuan = (config.getEarnPerYuan() != null && config.getEarnPerYuan() > 0)
                 ? config.getEarnPerYuan() : 1;
         int yuan = (int) (payPrice / 100L);
@@ -165,7 +165,7 @@ public class RestaurantMemberServiceImpl extends ServiceImpl<MemberMapper, Membe
         if (getById(memberId) == null) {
             return; // 尚未建档的散客，忽略冲正
         }
-        MemberConfigDO config = memberConfigService.getOrInitConfig();
+        RestaurantMemberConfigDO config = memberConfigService.getOrInitConfig();
         int earnPerYuan = (config.getEarnPerYuan() != null && config.getEarnPerYuan() > 0)
                 ? config.getEarnPerYuan() : 1;
         int yuan = (int) (payPrice / 100L);
@@ -249,7 +249,7 @@ public class RestaurantMemberServiceImpl extends ServiceImpl<MemberMapper, Membe
      * 根据消费升级基准，计算命中的最高等级。
      * levelUpMode=0 按成长值；=1 按累计消费（分）。
      */
-    private Long computeLevel(MemberDO member, MemberConfigDO config) {
+    private Long computeLevel(MemberDO member, RestaurantMemberConfigDO config) {
         List<MemberLevelConfigDO> levels = memberLevelConfigMapper.selectList(
                 MemberLevelConfigDO::getStatus, 1);
         if (levels == null || levels.isEmpty()) {
