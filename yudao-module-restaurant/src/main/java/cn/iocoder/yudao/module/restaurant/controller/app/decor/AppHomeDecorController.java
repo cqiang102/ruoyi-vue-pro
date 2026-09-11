@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import javax.annotation.security.PermitAll;
 
 /**
  * 消费者小程序 - 首页装修（M-02）
@@ -31,6 +32,8 @@ public class AppHomeDecorController {
 
     @Resource
     private HomeDecorMapper homeDecorMapper;
+
+    @PermitAll // C 端免登录：H5 登录前首屏需要
 
     @GetMapping("/list")
     @Operation(summary = "门店装修条目（已启用，按 sort 升序）")

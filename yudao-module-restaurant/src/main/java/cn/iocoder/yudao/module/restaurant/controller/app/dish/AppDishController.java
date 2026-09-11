@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import javax.annotation.security.PermitAll;
 
 @Tag(name = "消费者小程序 - 菜品")
 @RestController
@@ -29,11 +30,15 @@ public class AppDishController {
     @Resource
     private DishCategoryService dishCategoryService;
 
+    @PermitAll // C 端免登录：H5 登录前首屏需要
+
     @GetMapping("/category-list")
     @Operation(summary = "获得在售分类列表（菜单 tab 用）")
     public CommonResult<List<DishCategoryVO.RespVO>> getCategoryList() {
         return success(dishCategoryService.getEnabledCategoryList());
     }
+
+    @PermitAll // C 端免登录：H5 登录前首屏需要
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得在售菜品列表（含规格/加料，点餐用）")

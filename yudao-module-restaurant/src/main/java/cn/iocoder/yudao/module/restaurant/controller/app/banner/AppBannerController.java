@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import javax.annotation.security.PermitAll;
 
 @Tag(name = "消费者小程序 - 轮播图")
 @RestController
@@ -23,6 +24,8 @@ public class AppBannerController {
 
     @Resource
     private BannerService bannerService;
+
+    @PermitAll // C 端免登录：H5 登录前首屏需要
 
     @GetMapping("/list")
     @Operation(summary = "获得启用中的轮播图列表（首页轮播用）")

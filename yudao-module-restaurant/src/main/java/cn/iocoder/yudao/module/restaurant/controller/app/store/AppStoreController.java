@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import javax.annotation.security.PermitAll;
 
 @Tag(name = "消费者小程序 - 门店")
 @RestController
@@ -25,11 +26,15 @@ public class AppStoreController {
     @Resource
     private StoreService storeService;
 
+    @PermitAll // C 端免登录：H5 登录前首屏需要
+
     @GetMapping("/get")
     @Operation(summary = "获得门店公开信息（含配送费/起送价，下单外卖用）")
     public CommonResult<StoreVO.RespVO> getStore(@RequestParam("id") Long id) {
         return success(storeService.getStore(id));
     }
+
+    @PermitAll // C 端免登录：H5 登录前首屏需要
 
     @GetMapping("/list")
     @Operation(summary = "门店列表（C-14：传入定位时按距离升序并返回距离公里数）")
