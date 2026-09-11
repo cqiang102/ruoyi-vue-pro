@@ -44,6 +44,11 @@ public class MemberRechargeServiceImpl implements MemberRechargeService {
     private WalletPayService walletPayService;
 
     @Override
+    // 补事务：先落 member_recharge 再建 pay_order，两步必须原子。
+    // 原先无 @Transactional，若 createWeixinPayOrder 失败（如 PayApp 被禁用/参数非法）
+    // 会残留 pay_order_id 为空的孤儿充值单。已验证 createWeixinPayOrder 仅本地建单
+    // （payOrderApi.createOrder 不发起远程调用），故此处开事务不会造成"事务内远程调用"。
+    @Transactional(rollbackFor = Exception.class)
     public Long createRecharge(Long userId, Integer userType, String appKey, Long payAmount, Long giftAmount) {
         if (payAmount == null || payAmount <= 0) {
             throw new ServiceException(ErrorCodeConstants.MEMBER_RECHARGE_AMOUNT_INVALID);
