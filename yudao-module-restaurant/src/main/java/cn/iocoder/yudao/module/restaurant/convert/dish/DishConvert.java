@@ -85,7 +85,9 @@ public class DishConvert {
             return null;
         }
         DishSpecDO specDO = new DishSpecDO();
-        specDO.setId(bean.getId());
+        // 不设置 id：调用方（DishServiceImpl.updateDish）采用"先软删后插入"策略，
+        // 软删不释放主键，若回传旧 id 会撞 PRIMARY 报 Duplicate entry，
+        // 且插入失败会让"删除已生效"变成静默清空（2026-09-16 实测复现）
         specDO.setDishId(dishId);
         specDO.setGroupName(bean.getGroupName());
         specDO.setOptionName(bean.getOptionName());
@@ -99,7 +101,7 @@ public class DishConvert {
             return null;
         }
         DishAddonDO addonDO = new DishAddonDO();
-        addonDO.setId(bean.getId());
+        // 同 convertSpecSave：不设置 id，避免"先软删后插入"时主键冲突导致规格/加料被清空
         addonDO.setDishId(dishId);
         addonDO.setGroupName(bean.getGroupName());
         addonDO.setOptionName(bean.getOptionName());

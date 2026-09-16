@@ -50,6 +50,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -692,23 +693,32 @@ public class OrderServiceImpl implements OrderService {
             String specDesc = null;
             if (it.getSpecId() != null) {
                 DishSpecDO spec = specMap.get(it.getSpecId());
-                if (spec != null) {
-                    unitPrice += spec.getPriceDelta() == null ? 0 : spec.getPriceDelta();
-                    specDesc = spec.getGroupName() + ":" + spec.getOptionName();
+                // P0-8：规格必须存在且属于当前菜品。
+                // 原实现只按 id 取、取不到就跳过，实测漏洞（2026-09-16）：
+                // 把 A 菜品的「小份 -500」规格传给 B 菜品（12800）下单，成交价 12300，可跨菜品压价。
+                if (spec == null || !Objects.equals(spec.getDishId(), dish.getId())) {
+                    throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_SPEC_INVALID);
                 }
+                unitPrice += spec.getPriceDelta() == null ? 0 : spec.getPriceDelta();
+                specDesc = spec.getGroupName() + ":" + spec.getOptionName();
             }
             long addonPrice = 0;
             StringBuilder addonDesc = new StringBuilder();
             if (it.getAddonIds() != null) {
-                for (Long addonId : it.getAddonIds()) {
+                // P0-8：加料同样必须属于当前菜品；先去重，防同一加料 id 被重复计费
+                Set<Long> itemAddonIds = it.getAddonIds().stream()
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                for (Long addonId : itemAddonIds) {
                     DishAddonDO addon = addonMap.get(addonId);
-                    if (addon != null) {
-                        addonPrice += addon.getPriceDelta() == null ? 0 : addon.getPriceDelta();
-                        if (addonDesc.length() > 0) {
-                            addonDesc.append("、");
-                        }
-                        addonDesc.append(addon.getGroupName()).append(":").append(addon.getOptionName());
+                    if (addon == null || !Objects.equals(addon.getDishId(), dish.getId())) {
+                        throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_ADDON_INVALID);
                     }
+                    addonPrice += addon.getPriceDelta() == null ? 0 : addon.getPriceDelta();
+                    if (addonDesc.length() > 0) {
+                        addonDesc.append("、");
+                    }
+                    addonDesc.append(addon.getGroupName()).append(":").append(addon.getOptionName());
                 }
             }
             int quantity = it.getQuantity() == null ? 1 : it.getQuantity();
@@ -716,7 +726,15 @@ public class OrderServiceImpl implements OrderService {
             if (quantity < 1 || quantity > 999) {
                 throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_QUANTITY_INVALID);
             }
+            // P0-8：规格加价/加料加价本身允许为负（如"小份 -500"），但组合后
+            // 不允许出现负单价或负的明细金额（实测曾落库 unit_price=-5720、total=-5720 的订单）
+            if (unitPrice < 0) {
+                throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_PRICE_INVALID);
+            }
             long lineTotal = unitPrice * quantity + addonPrice;
+            if (lineTotal < 0) {
+                throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_PRICE_INVALID);
+            }
             items.add(new OrderItemDO()
                     .setOrderId(orderId)
                     .setDishId(dish.getId())
@@ -904,7 +922,12 @@ public class OrderServiceImpl implements OrderService {
      */
     private int toIntPrice(Long price) {
         long value = price == null ? 0L : price;
-        if (value <= 0 || value > MAX_PAY_PRICE) {
+        // 金额 <= 0 与"超出上限"是两回事：原先共用 ORDER_PRICE_OVERFLOW（"超出支付渠道上限"），
+        // 负数/零元订单会拿到误导性文案，此处拆开（2026-09-16）
+        if (value <= 0) {
+            throw new ServiceException(ErrorCodeConstants.ORDER_PRICE_NOT_POSITIVE);
+        }
+        if (value > MAX_PAY_PRICE) {
             throw new ServiceException(ErrorCodeConstants.ORDER_PRICE_OVERFLOW);
         }
         return (int) value;

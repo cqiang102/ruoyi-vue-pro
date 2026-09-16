@@ -60,6 +60,10 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_PRICE_OVERFLOW = new ErrorCode(2_000_006_023, "订单金额超出支付渠道上限");
     ErrorCode ORDER_REFUND_CALLBACK_INVALID = new ErrorCode(2_000_006_024, "退款回调校验失败：退款单不存在或未退款成功");
     ErrorCode ORDER_REFUND_ORDER_MISMATCH = new ErrorCode(2_000_006_025, "回调退款单号与订单不匹配");
+    ErrorCode ORDER_ITEM_SPEC_INVALID = new ErrorCode(2_000_006_026, "规格选项不存在或不属于该菜品，请重新选择");
+    ErrorCode ORDER_ITEM_ADDON_INVALID = new ErrorCode(2_000_006_027, "加料选项不存在或不属于该菜品，请重新选择");
+    ErrorCode ORDER_ITEM_PRICE_INVALID = new ErrorCode(2_000_006_028, "菜品金额计算异常：规格/加料加价后金额为负");
+    ErrorCode ORDER_PRICE_NOT_POSITIVE = new ErrorCode(2_000_006_029, "订单金额必须大于 0");
 
     // ========== 会员储值充值 2-000-010-xxx ==========
     // 注意：本段原先误占 2-000-007-001 / 2-000-007-002，与下方「会员档案」段重复，

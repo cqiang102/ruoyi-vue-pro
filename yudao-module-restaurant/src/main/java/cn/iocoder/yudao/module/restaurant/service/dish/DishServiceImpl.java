@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.restaurant.dal.mysql.dish.DishSpecMapper;
 import cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -42,6 +43,7 @@ public class DishServiceImpl implements DishService {
     private DishAddonMapper dishAddonMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createDish(DishVO.SaveReqVO createReqVO) {
         validateCategoryExists(createReqVO.getCategoryId());
         DishDO dish = new DishDO()
@@ -60,6 +62,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDish(DishVO.SaveReqVO updateReqVO) {
         DishDO existing = validateDishExists(updateReqVO.getId());
         validateCategoryExists(updateReqVO.getCategoryId());
@@ -78,6 +81,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDish(Long id) {
         validateDishExists(id);
         dishMapper.deleteById(id);
