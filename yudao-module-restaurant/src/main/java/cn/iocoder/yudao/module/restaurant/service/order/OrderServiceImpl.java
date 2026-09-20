@@ -137,6 +137,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createOrder(OrderVO.CreateReqVO createReqVO) {
+        // 门店编号兜底（VO 上不再标 @NotNull：门店端由 Controller 按登录店员注入，
+        // 而 @Valid 先于注入执行，标必填会让收银台 400）
+        if (createReqVO.getStoreId() == null) {
+            throw new ServiceException(ErrorCodeConstants.ORDER_STORE_REQUIRED);
+        }
         StoreDO store = storeMapper.selectById(createReqVO.getStoreId());
         if (store == null) {
             throw new ServiceException(ErrorCodeConstants.STORE_NOT_EXISTS);

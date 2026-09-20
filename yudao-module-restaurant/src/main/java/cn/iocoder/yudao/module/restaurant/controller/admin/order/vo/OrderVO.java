@@ -69,8 +69,11 @@ public class OrderVO {
     @Data
     public static class CreateReqVO {
 
-        @Schema(description = "门店编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        @NotNull(message = "门店编号不能为空")
+        // 注意：这里不能加 @NotNull —— 门店端（/admin-api/store/order/create）是在
+        // Controller 方法体内用登录店员绑定门店覆盖该字段，而 @Valid 在方法体之前执行，
+        // 加了必填校验会让"不传 storeId"的收银台调用直接 400（2026-09-20 实测）。 
+        // 兼容性由服务端兜底：OrderServiceImpl.createOrder 里对 null 抛 ORDER_STORE_REQUIRED。
+        @Schema(description = "门店编号（消费端必传；门店端由服务端按登录店员注入，无需传）", example = "1")
         private Long storeId;
 
         @Schema(description = "桌台编号（堂食必填）", example = "2")
