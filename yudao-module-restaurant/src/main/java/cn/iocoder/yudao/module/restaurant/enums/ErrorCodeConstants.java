@@ -64,6 +64,7 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_ITEM_ADDON_INVALID = new ErrorCode(2_000_006_027, "加料选项不存在或不属于该菜品，请重新选择");
     ErrorCode ORDER_ITEM_PRICE_INVALID = new ErrorCode(2_000_006_028, "菜品金额计算异常：规格/加料加价后金额为负");
     ErrorCode ORDER_PRICE_NOT_POSITIVE = new ErrorCode(2_000_006_029, "订单金额必须大于 0");
+    ErrorCode ORDER_ITEM_SPEC_REQUIRED = new ErrorCode(2_000_006_030, "该菜品有规格选项，必须选择规格后下单");
 
     // ========== 会员储值充值 2-000-010-xxx ==========
     // 注意：本段原先误占 2-000-007-001 / 2-000-007-002，与下方「会员档案」段重复，

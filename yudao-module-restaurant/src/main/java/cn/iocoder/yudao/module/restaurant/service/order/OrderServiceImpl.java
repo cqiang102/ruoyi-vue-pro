@@ -677,6 +677,12 @@ public class OrderServiceImpl implements OrderService {
         Map<Long, DishAddonDO> addonMap = addonIds.isEmpty() ? Collections.emptyMap()
                 : dishAddonMapper.selectBatchIds(addonIds).stream()
                         .collect(Collectors.toMap(DishAddonDO::getId, Function.identity(), (a, b) -> a));
+        // 哪些菜品配了规格：配了规格的菜品下单时必须选规格（否则会按基础价成交，
+        // 等于跳过规格加价；强哥 2026-09-20 定：必选）
+        Set<Long> dishIdsWithSpec = dishIds.isEmpty() ? Collections.emptySet()
+                : dishSpecMapper.selectList(new LambdaQueryWrapperX<DishSpecDO>()
+                        .in(DishSpecDO::getDishId, dishIds)).stream()
+                        .map(DishSpecDO::getDishId).collect(Collectors.toSet());
         for (OrderVO.ItemCreateVO it : reqItems) {
             DishDO dish = dishMap.get(it.getDishId());
             if (dish == null) {
@@ -691,6 +697,10 @@ public class OrderServiceImpl implements OrderService {
             }
             long unitPrice = dish.getPrice() == null ? 0 : dish.getPrice();
             String specDesc = null;
+            // 有规格的菜品必须选规格（强哥 2026-09-20 定）
+            if (it.getSpecId() == null && dishIdsWithSpec.contains(dish.getId())) {
+                throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_SPEC_REQUIRED);
+            }
             if (it.getSpecId() != null) {
                 DishSpecDO spec = specMap.get(it.getSpecId());
                 // P0-8：规格必须存在且属于当前菜品。
@@ -731,7 +741,9 @@ public class OrderServiceImpl implements OrderService {
             if (unitPrice < 0) {
                 throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_PRICE_INVALID);
             }
-            long lineTotal = unitPrice * quantity + addonPrice;
+            // 加料按份计费（强哥 2026-09-20 定）：每份都要加料钱
+            // 原实现 lineTotal = unitPrice * quantity + addonPrice，2 份只收 1 份加料钱
+            long lineTotal = (unitPrice + addonPrice) * quantity;
             if (lineTotal < 0) {
                 throw new ServiceException(ErrorCodeConstants.ORDER_ITEM_PRICE_INVALID);
             }

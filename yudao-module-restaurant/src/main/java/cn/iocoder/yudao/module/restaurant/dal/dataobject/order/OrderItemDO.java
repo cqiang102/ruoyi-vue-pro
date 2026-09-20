@@ -51,7 +51,7 @@ public class OrderItemDO extends TenantBaseDO {
      */
     private Long unitPrice;
     /**
-     * 加料合计（单位：分）
+     * 每份加料合计（单位：分；按份计费，行总价 =（单价 + 每份加料）× 数量）
      */
     private Long addonPrice;
     /**
@@ -59,7 +59,7 @@ public class OrderItemDO extends TenantBaseDO {
      */
     private Integer quantity;
     /**
-     * 行总价（单位：分 = unitPrice*quantity + addonPrice）
+     * 行总价（单位：分 =（unitPrice + addonPrice）× quantity）
      */
     private Long totalPrice;
 
