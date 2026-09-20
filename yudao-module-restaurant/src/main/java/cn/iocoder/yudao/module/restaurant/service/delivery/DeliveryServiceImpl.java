@@ -28,12 +28,16 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_CALLBACK_SIGN_INVALID;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_CALLBACK_URL_NOT_CONFIGURED;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_CONFIG_DISABLED;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_CONFIG_NOT_EXISTS;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_EXISTS;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_NOT_DELIVERY;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_NOT_PAID;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_STATUS_INVALID;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_ORDER_STORE_MISMATCH;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.DELIVERY_RECEIVER_REQUIRED;
 
 /**
  * 达达配送 Service 实现（M-11）
@@ -106,21 +110,28 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Override
     public Long sendDelivery(Long orderId, Long storeId) {
         OrderDO order = orderMapper.selectById(orderId);
-        if (order == null || !order.getStoreId().equals(storeId)) {
+        // 订单不存在与"订单不属于本店"分开报：原先统一报 DELIVERY_ORDER_NOT_EXISTS（"运单不存在"），
+        // 越权排查时会误以为是运单问题（2026-09-18 实测：store002 发 store001 的订单拿到"运单不存在"）
+        if (order == null) {
             throw exception(DELIVERY_ORDER_NOT_EXISTS);
+        }
+        if (!order.getStoreId().equals(storeId)) {
+            throw exception(DELIVERY_ORDER_STORE_MISMATCH);
         }
         // 仅外卖订单可发配送
         if (order.getType() == null || order.getType() != 3) {
             throw exception(DELIVERY_ORDER_NOT_DELIVERY);
         }
-        // 已支付/制作中才可发单（已完成不可补发）
+        // 已支付/制作中才可发单（已完成不可补发）。
+        // 原先报 DELIVERY_ORDER_STATUS_INVALID（"当前运单状态不允许该操作"）——拦的是「订单」未支付，
+        // 却把责任指向「运单」，是店员最先撞到的一条误导文案（2026-09-18）
         Integer st = order.getStatus();
         if (!OrderStatusEnum.PAID.getStatus().equals(st) && !OrderStatusEnum.COOKING.getStatus().equals(st)) {
-            throw exception(DELIVERY_ORDER_STATUS_INVALID);
+            throw exception(DELIVERY_ORDER_NOT_PAID);
         }
-        // 必须有收货信息
+        // 必须有收货信息（原先报 DELIVERY_ORDER_NOT_DELIVERY「仅外卖订单可发配送」，与真实原因不符）
         if (StrUtil.isBlank(order.getReceiverName()) || StrUtil.isBlank(order.getReceiverAddress())) {
-            throw exception(DELIVERY_ORDER_NOT_DELIVERY);
+            throw exception(DELIVERY_RECEIVER_REQUIRED);
         }
         // 已有进行中运单则拒绝
         DeliveryOrderDO exist = deliveryOrderMapper.selectByOrderId(orderId);
@@ -135,8 +146,11 @@ public class DeliveryServiceImpl implements DeliveryService {
         if (config.getEnabled() == null || config.getEnabled() != 1) {
             throw exception(DELIVERY_CONFIG_DISABLED);
         }
+        // 回调地址属于「服务端」配置，与门店配置无关：
+        // 原先报 DELIVERY_CONFIG_NOT_EXISTS（"门店配送配置不存在"），
+        // 实测库里配置存在却报门店配置缺失，会把排查方向带偏（2026-09-18）
         if (StrUtil.isBlank(callbackUrl)) {
-            throw exception(DELIVERY_CONFIG_NOT_EXISTS);
+            throw exception(DELIVERY_CALLBACK_URL_NOT_CONFIGURED);
         }
         // 发单（金额转元；不垫付）。收货人经纬度不传（OrderDO 无收货坐标），由达达按收货地址解析
         Map<String, Object> result;

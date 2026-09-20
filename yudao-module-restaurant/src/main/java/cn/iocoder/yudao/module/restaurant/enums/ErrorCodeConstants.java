@@ -123,6 +123,10 @@ public interface ErrorCodeConstants {
     ErrorCode DELIVERY_ORDER_STATUS_INVALID = new ErrorCode(2_000_015_004, "当前运单状态不允许该操作");
     ErrorCode DELIVERY_CALLBACK_SIGN_INVALID = new ErrorCode(2_000_015_005, "配送回调签名校验失败");
     ErrorCode DELIVERY_ORDER_NOT_DELIVERY = new ErrorCode(2_000_015_006, "仅外卖订单可发配送");
+    ErrorCode DELIVERY_CALLBACK_URL_NOT_CONFIGURED = new ErrorCode(2_000_015_007, "服务端未配置达达回调地址（yudao.restaurant.dada.callback-url），无法发单");
+    ErrorCode DELIVERY_RECEIVER_REQUIRED = new ErrorCode(2_000_015_008, "订单缺少收货人姓名或收货地址，无法发配送");
+    ErrorCode DELIVERY_ORDER_STORE_MISMATCH = new ErrorCode(2_000_015_009, "订单不属于当前门店，无法发配送");
+    ErrorCode DELIVERY_ORDER_NOT_PAID = new ErrorCode(2_000_015_010, "仅已支付/制作中的外卖订单可发配送，请先完成收款");
 
     // ========== 订阅消息 2-000-016-000（M-12） ==========
     ErrorCode NOTIFY_TEMPLATE_NOT_EXISTS = new ErrorCode(2_000_016_000, "订阅消息模板不存在");
