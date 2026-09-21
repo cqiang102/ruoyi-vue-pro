@@ -147,12 +147,15 @@ public class InvoiceService {
 
     /**
      * 管理端审核：通过 = 线下已开具并标记；驳回 = 必填原因
+     *
+     * @param storeId 登录店员绑定门店（服务端注入），用于校验申请归属，杜绝跨店审核
      */
-    public void audit(InvoiceVO.AuditReqVO reqVO) {
+    public void audit(InvoiceVO.AuditReqVO reqVO, Long storeId) {
         InvoiceDO invoice = invoiceMapper.selectById(reqVO.getId());
         if (invoice == null) {
             throw exception(INVOICE_NOT_EXISTS);
         }
+        validateStoreOwned(invoice, storeId);
         if (!Integer.valueOf(0).equals(invoice.getStatus())) {
             throw exception(INVOICE_STATUS_INVALID);
         }
@@ -172,12 +175,26 @@ public class InvoiceService {
 
     /**
      * 管理端删除申请记录（清理脏数据，不影响订单）
+     *
+     * @param storeId 登录店员绑定门店（服务端注入），仅能删本店申请
      */
-    public void deleteInvoice(Long id) {
-        if (id == null || invoiceMapper.selectById(id) == null) {
+    public void deleteInvoice(Long id, Long storeId) {
+        InvoiceDO invoice = id == null ? null : invoiceMapper.selectById(id);
+        if (invoice == null) {
             throw exception(INVOICE_NOT_EXISTS);
         }
+        validateStoreOwned(invoice, storeId);
         invoiceMapper.deleteById(id);
+    }
+
+    /**
+     * 门店归属校验：申请单的 storeId 必须与登录店员绑定门店一致。
+     * 2026-09-21 修复——此前 audit/delete 不校验归属，实测 store001 可直接审核门店2 的申请。
+     */
+    private void validateStoreOwned(InvoiceDO invoice, Long storeId) {
+        if (storeId == null || !Objects.equals(invoice.getStoreId(), storeId)) {
+            throw exception(STORE_STAFF_STORE_MISMATCH);
+        }
     }
 
     // ========== 查询 ==========
