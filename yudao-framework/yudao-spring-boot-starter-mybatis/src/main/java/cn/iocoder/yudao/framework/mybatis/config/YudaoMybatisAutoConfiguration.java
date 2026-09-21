@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
 import com.baomidou.mybatisplus.extension.parser.cache.JdkSerialCaffeineJsqlParseCache;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -47,6 +48,11 @@ public class YudaoMybatisAutoConfiguration {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        // 乐观锁插件：实体字段标 @Version 时，updateById 会自动带上 version 条件并把 version +1。
+        // 漏注册会让「有 @Version 的实体」调用 updateById 时直接抛
+        // BindingException: Parameter 'MP_OPTLOCK_VERSION_ORIGINAL' not found —— 2026-09-21 实测：
+        // MemberDO（@Version）走这条路径，导致门店「完成订单 / 积分兑换 / 退款冲正」全部 500。
+        mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
         // ↓↓↓ 按需开启，可能会影响到 updateBatch 的地方：例如说文件配置管理 ↓↓↓
         // mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor()); // 拦截没有指定条件的 update 和 delete 语句
