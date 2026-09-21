@@ -34,7 +34,7 @@ public class MemberRechargeDO extends TenantBaseDO {
     private Long userId;
 
     /**
-     * 用户类型（芋道 UserTypeEnum.MEMBER=2）
+     * 用户类型（芋道 UserTypeEnum.MEMBER=1）
      */
     private Integer userType;
 

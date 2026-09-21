@@ -16,7 +16,7 @@ public interface MemberRechargeService {
      * 创建储值充值单，返回芋道 pay_order.id（供前端拉起微信支付）
      *
      * @param userId     用户编号
-     * @param userType   用户类型（芋道 UserTypeEnum.MEMBER=2）
+     * @param userType   用户类型（芋道 UserTypeEnum.MEMBER=1；消费端由 Controller 统一收口，不采信前端传值）
      * @param appKey     支付应用标识
      * @param payAmount  充值本金（单位：分，必须 > 0）
      * @param giftAmount 赠送金额（单位：分，可空，默认 0）

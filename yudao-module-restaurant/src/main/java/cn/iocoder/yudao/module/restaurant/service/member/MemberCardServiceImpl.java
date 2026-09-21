@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.restaurant.service.member;
 
 import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -44,9 +45,13 @@ public class MemberCardServiceImpl implements MemberCardService {
     private static final String ORDER_PREFIX = "MCD-";
 
     /**
-     * 会员端 userType（与 MemberRecharge / 前端 getWallet(2) 一致）
+     * 会员端 userType：统一取框架枚举 {@link UserTypeEnum#MEMBER}（值为 1）。
+     *
+     * 原先写死为 2，与订单余额支付（OrderServiceImpl 用 UserTypeEnum.MEMBER.getValue()=1）
+     * 指向的钱包不一致 → 购卡固定报「钱包余额不足」（余额明明够）。
+     * 2026-09-21 实测（余额 83460、卡价 9900 仍报余额不足）后改为直接引用枚举。
      */
-    private static final Integer USER_TYPE_MEMBER = 2;
+    private static final Integer USER_TYPE_MEMBER = UserTypeEnum.MEMBER.getValue();
 
     @Resource
     private MemberCardMapper memberCardMapper;
