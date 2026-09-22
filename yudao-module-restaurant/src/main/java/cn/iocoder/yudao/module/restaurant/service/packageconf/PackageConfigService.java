@@ -48,4 +48,13 @@ public interface PackageConfigService {
      */
     PackageConfigDO getActivePackageRequired(Long id);
 
+    /**
+     * 查询套餐（不做「必须启用」校验，不存在返回 null）。
+     *
+     * 用于订阅列表回显套餐名等只读场景：套餐停用/删除后，历史订阅仍要能正常展示，
+     * 不能因为套餐状态而让查询接口报错（2026-09-21 修复：原先复用 getActivePackageRequired，
+     * 套餐一停用订阅列表就返回「套餐已停用，不可订阅」）。
+     */
+    PackageConfigDO getPackageOrNull(Long id);
+
 }

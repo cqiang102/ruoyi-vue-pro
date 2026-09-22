@@ -136,4 +136,9 @@ public class PackageConfigServiceImpl extends ServiceImpl<PackageConfigMapper, P
         return pkg;
     }
 
+    @Override
+    public PackageConfigDO getPackageOrNull(Long id) {
+        return id == null ? null : packageConfigMapper.selectById(id);
+    }
+
 }

@@ -47,6 +47,13 @@ public class TenantSubscriptionServiceImpl extends ServiceImpl<TenantSubscriptio
         PackageConfigDO pkg = packageConfigService.getActivePackageRequired(reqVO.getPackageId());
         Long tenantId = reqVO.getTenantId();
         LocalDateTime now = LocalDateTime.now();
+        // 是否首次订阅（该租户此前没有任何订阅记录）——只有首次才初始化默认门店数据。
+        // 2026-09-21 修复：原先每次 open 都调 initTenantDefaultData()，
+        // 实测续费/重复订阅会给租户再建一套「总店 + 4 个菜品分类 + 10 张桌台」，
+        // 商户每续一次费就被塞一套门店数据。
+        boolean firstSubscription = Boolean.TRUE.equals(TenantUtils.executeIgnore(() ->
+                getBaseMapper().selectCount(new LambdaQueryWrapperX<TenantSubscriptionDO>()
+                        .eq(TenantSubscriptionDO::getTenantId, tenantId)) == 0));
         return TenantUtils.execute(tenantId, () -> {
             TenantSubscriptionDO sub = new TenantSubscriptionDO();
             sub.setTenantId(tenantId);
@@ -57,7 +64,9 @@ public class TenantSubscriptionServiceImpl extends ServiceImpl<TenantSubscriptio
             sub.setPayOrderId(reqVO.getPayOrderId());
             sub.setAmount(reqVO.getAmount());
             getBaseMapper().insert(sub);
-            initTenantDefaultData();
+            if (firstSubscription) {
+                initTenantDefaultData();
+            }
             return sub.getId();
         });
     }
@@ -77,7 +86,8 @@ public class TenantSubscriptionServiceImpl extends ServiceImpl<TenantSubscriptio
                 respVO.setId(s.getId());
                 respVO.setTenantId(s.getTenantId());
                 respVO.setPackageId(s.getPackageId());
-                PackageConfigDO pkg = packageConfigService.getActivePackageRequired(s.getPackageId());
+                // 只读回显：套餐停用/删除也必须能列出来，不能抛异常
+                PackageConfigDO pkg = packageConfigService.getPackageOrNull(s.getPackageId());
                 respVO.setPackageName(pkg != null ? pkg.getName() : null);
                 respVO.setStartTime(s.getStartTime());
                 respVO.setExpireTime(s.getExpireTime());
