@@ -413,6 +413,10 @@ public class OrderServiceImpl implements OrderService {
                     .eq(OrderDO::getId, orderId)
                     .set(OrderDO::getMemberId, memberService.getOrCreateMember(userId).getId()));
         }
+        // M-12：微信订阅消息（支付成功）。原先只有微信支付回调会发，
+        // 用余额支付的客户收不到「支付成功」通知（2026-09-22 补齐，与回调口径一致）
+        sendNotify(order, cn.iocoder.yudao.module.restaurant.service.notify.NotifyService.SCENE_PAY_SUCCESS,
+                fen2YuanStr(order.getPayPrice()));
     }
 
     /**
@@ -435,6 +439,9 @@ public class OrderServiceImpl implements OrderService {
         if (rows == 0) {
             throw new ServiceException(ErrorCodeConstants.ORDER_NOT_UNPAID);
         }
+        // M-12：微信订阅消息（支付成功）——现金收讫同样属于「支付成功」场景（2026-09-22 补齐）
+        sendNotify(order, cn.iocoder.yudao.module.restaurant.service.notify.NotifyService.SCENE_PAY_SUCCESS,
+                fen2YuanStr(order.getPayPrice()));
     }
 
     @Override
