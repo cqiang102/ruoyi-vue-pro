@@ -79,6 +79,12 @@ public class PointShopVO {
      */
     @Data
     public static class ExchangeReqVO {
+        /**
+         * 门店编号：积分商品是「门店级」的（兑换单也落在该门店、由该店核销），
+         * 必须与商品的 storeId 一致，避免会员兑换到其他门店的商品（2026-09-22 补校验）
+         */
+        @NotNull(message = "门店编号不能为空")
+        private Long storeId;
         @NotNull(message = "商品编号不能为空")
         private Long productId;
         @NotNull(message = "数量不能为空")

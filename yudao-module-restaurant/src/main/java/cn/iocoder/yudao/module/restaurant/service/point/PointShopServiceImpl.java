@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.*;
@@ -112,10 +113,15 @@ public class PointShopServiceImpl implements PointShopService {
         if (member == null) {
             throw exception(MEMBER_NOT_EXISTS);
         }
-        // 2. 商品校验（本店上架）
+        // 2. 商品校验（存在 + 上架 + 属于请求的门店）
         PointProductDO product = pointProductMapper.selectById(reqVO.getProductId());
         if (product == null) {
             throw exception(POINT_PRODUCT_NOT_EXISTS);
+        }
+        // 归属校验：兑换单落在商品所属门店、也只能由该门店核销，
+        // 原先不校验 storeId，会员可兑换任意门店的商品（2026-09-22 实测确认后补上）
+        if (!Objects.equals(product.getStoreId(), reqVO.getStoreId())) {
+            throw exception(POINT_PRODUCT_NOT_IN_STORE);
         }
         if (product.getStatus() == null || product.getStatus() != 1) {
             throw exception(POINT_PRODUCT_OFF_SHELF);

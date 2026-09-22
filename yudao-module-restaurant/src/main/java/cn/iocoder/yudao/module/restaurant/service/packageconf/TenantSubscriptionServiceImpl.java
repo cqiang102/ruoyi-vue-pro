@@ -54,12 +54,24 @@ public class TenantSubscriptionServiceImpl extends ServiceImpl<TenantSubscriptio
         boolean firstSubscription = Boolean.TRUE.equals(TenantUtils.executeIgnore(() ->
                 getBaseMapper().selectCount(new LambdaQueryWrapperX<TenantSubscriptionDO>()
                         .eq(TenantSubscriptionDO::getTenantId, tenantId)) == 0));
+        // 续费叠加（2026-09-22）：新一期从「该租户现有有效订阅的最晚到期时间」接续，
+        // 原实现 startTime 恒为 now，客户第二次付钱得到的是一段与被覆盖期间重叠的时间
+        // （实测两条订阅各自 now ~ now+3月，等于白付一期）。
+        LocalDateTime baseTime = TenantUtils.executeIgnore(() -> {
+            TenantSubscriptionDO last = getBaseMapper().selectOne(new LambdaQueryWrapperX<TenantSubscriptionDO>()
+                    .eq(TenantSubscriptionDO::getTenantId, tenantId)
+                    .eq(TenantSubscriptionDO::getStatus, 1)
+                    .orderByDesc(TenantSubscriptionDO::getExpireTime)
+                    .last("LIMIT 1"));
+            return last == null || last.getExpireTime() == null ? now : last.getExpireTime();
+        });
+        LocalDateTime startTime = baseTime != null && baseTime.isAfter(now) ? baseTime : now;
         return TenantUtils.execute(tenantId, () -> {
             TenantSubscriptionDO sub = new TenantSubscriptionDO();
             sub.setTenantId(tenantId);
             sub.setPackageId(pkg.getId());
-            sub.setStartTime(now);
-            sub.setExpireTime(now.plusMonths(pkg.getDurationMonths()));
+            sub.setStartTime(startTime);
+            sub.setExpireTime(startTime.plusMonths(pkg.getDurationMonths()));
             sub.setStatus(1);
             sub.setPayOrderId(reqVO.getPayOrderId());
             sub.setAmount(reqVO.getAmount());
