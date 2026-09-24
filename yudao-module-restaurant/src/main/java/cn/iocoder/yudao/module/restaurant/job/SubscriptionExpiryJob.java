@@ -22,14 +22,21 @@ import java.util.List;
  * @author 餐饮 SaaS
  */
 @Component
-@TenantIgnore
 @Slf4j
 public class SubscriptionExpiryJob implements JobHandler {
 
     @Resource
     private TenantSubscriptionMapper subscriptionMapper;
 
+    /**
+     * ⚠️ {@code @TenantIgnore} 必须标在**方法**上，不能只标在类上：
+     * TenantIgnoreAspect 的切点是 {@code @Around("@annotation(tenantIgnore)")}，
+     * 只匹配方法级注解（类级需要 @within，框架没写）。
+     * 2026-09-24 实测：原先把注解标在类上，job 一旦被调度就在 selectList 处抛
+     * NullPointerException「TenantContextHolder 不存在租户编号」——租户拦截器取不到租户号。
+     */
     @Override
+    @TenantIgnore
     public String execute(String param) {
         LocalDateTime now = LocalDateTime.now();
         List<TenantSubscriptionDO> expired = subscriptionMapper.selectList(new LambdaQueryWrapperX<TenantSubscriptionDO>()
