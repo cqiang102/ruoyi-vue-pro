@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -18,8 +17,9 @@ public class NoticeVO {
     @Schema(description = "编号", example = "1")
     private Long id;
 
-    @Schema(description = "门店编号（0 = 全平台）", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "门店编号不能为空")
+    // 门店编号由服务端按登录账号绑定的门店注入，前端可不传
+    // （门店端接口只能发本店公告；"全平台公告"由平台端另行处理）
+    @Schema(description = "门店编号（服务端按登录门店注入，可不传）", example = "1")
     private Long storeId;
 
     @Schema(description = "标题", requiredMode = Schema.RequiredMode.REQUIRED, example = "国庆营业时间调整")

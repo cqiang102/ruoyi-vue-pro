@@ -79,12 +79,14 @@ public class WithdrawService {
         if (reqVO.getAmount() == null || reqVO.getAmount() <= 0) {
             throw exception(WITHDRAW_AMOUNT_INVALID);
         }
+        // 门店归属取登录账号绑定的门店（不采信入参），账户也必须是本店的
+        Long storeId = storeAuthService.getLoginUserStoreId();
         WithdrawAccountDO account = withdrawAccountMapper.selectById(reqVO.getAccountId());
-        if (account == null || !account.getStoreId().equals(reqVO.getStoreId())) {
+        if (account == null || !account.getStoreId().equals(storeId)) {
             throw exception(WITHDRAW_ACCOUNT_NOT_EXISTS);
         }
         WithdrawDO withdraw = new WithdrawDO();
-        withdraw.setStoreId(reqVO.getStoreId());
+        withdraw.setStoreId(storeId);
         withdraw.setAmount(reqVO.getAmount());
         withdraw.setStatus(0);
         withdraw.setAccountSnapshot(account.getAccountType() + " | " + account.getAccountName()

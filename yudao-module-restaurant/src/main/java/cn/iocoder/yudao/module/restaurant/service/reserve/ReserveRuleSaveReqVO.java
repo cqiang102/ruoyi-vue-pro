@@ -18,8 +18,8 @@ public class ReserveRuleSaveReqVO {
     @Schema(description = "规则编号（更新必填）", example = "1")
     private Long id;
 
-    @Schema(description = "门店编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "门店编号不能为空")
+    // 门店编号由服务端按登录账号绑定的门店注入，前端可不传
+    @Schema(description = "门店编号（服务端按登录门店注入，可不传）", example = "1")
     private Long storeId;
 
     @Schema(description = "星期：0-周日 1-周一 … 6-周六；-1 = 每天", requiredMode = Schema.RequiredMode.REQUIRED, example = "-1")

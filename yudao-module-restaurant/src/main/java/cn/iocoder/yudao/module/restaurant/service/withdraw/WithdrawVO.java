@@ -20,8 +20,8 @@ public class WithdrawVO {
         @Schema(description = "账户编号（更新必填）", example = "1")
         private Long id;
 
-        @Schema(description = "门店编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        @NotNull(message = "门店编号不能为空")
+        // 门店编号由服务端按登录账号绑定的门店注入，前端可不传
+        @Schema(description = "门店编号（服务端按登录门店注入，可不传）", example = "1")
         private Long storeId;
 
         @Schema(description = "账户类型：1-对公银行 2-微信 3-支付宝", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -44,8 +44,8 @@ public class WithdrawVO {
     @Data
     public static class ApplyReqVO {
 
-        @Schema(description = "门店编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-        @NotNull(message = "门店编号不能为空")
+        // 门店编号由服务端按登录账号绑定的门店注入（同时用于校验账户归属），前端可不传
+        @Schema(description = "门店编号（服务端按登录门店注入，可不传）", example = "1")
         private Long storeId;
 
         @Schema(description = "提现账户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
