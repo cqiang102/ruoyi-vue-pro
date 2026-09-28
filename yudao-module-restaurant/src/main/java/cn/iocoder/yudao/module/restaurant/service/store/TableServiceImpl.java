@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -33,13 +34,18 @@ public class TableServiceImpl implements TableService {
     private TableMapper tableMapper;
     @Resource
     private StoreMapper storeMapper;
+    @Resource
+    private StoreAuthService storeAuthService;
 
     @Override
     public Long createTable(TableVO.SaveReqVO createReqVO) {
-        validateStoreExists(createReqVO.getStoreId());
-        validateTableNoUnique(createReqVO.getStoreId(), createReqVO.getTableNo(), null);
+        // 门店端接口：门店归属一律取登录账号绑定的门店，不采信入参 storeId
+        // （2026-09-28 实测：原先直接用入参，A 店店员可以在 B 店建桌台）
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateStoreExists(storeId);
+        validateTableNoUnique(storeId, createReqVO.getTableNo(), null);
         TableDO table = new TableDO()
-                .setStoreId(createReqVO.getStoreId())
+                .setStoreId(storeId)
                 .setTableNo(createReqVO.getTableNo())
                 .setCategory(createReqVO.getCategory())
                 .setSeats(createReqVO.getSeats())
@@ -53,11 +59,11 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void updateTable(TableVO.SaveReqVO updateReqVO) {
-        TableDO existing = validateTableExists(updateReqVO.getId());
-        validateStoreExists(updateReqVO.getStoreId());
-        validateTableNoUnique(updateReqVO.getStoreId(), updateReqVO.getTableNo(), updateReqVO.getId());
-        existing.setStoreId(updateReqVO.getStoreId())
-                .setTableNo(updateReqVO.getTableNo())
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        // 归属校验 + 不再允许改 storeId（防把桌台搬到别的门店）
+        TableDO existing = validateTableInStore(updateReqVO.getId(), storeId);
+        validateTableNoUnique(storeId, updateReqVO.getTableNo(), updateReqVO.getId());
+        existing.setTableNo(updateReqVO.getTableNo())
                 .setCategory(updateReqVO.getCategory())
                 .setSeats(updateReqVO.getSeats());
         tableMapper.updateById(existing);
@@ -65,7 +71,9 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void deleteTable(Long id) {
-        validateTableExists(id);
+        // 2026-09-28 实测：原先只校验"桌台存在"，A 店店员可删除 B 店桌台（已复现并落库）
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateTableInStore(id, storeId);
         tableMapper.deleteById(id);
     }
 
@@ -95,18 +103,20 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void generateTables(TableVO.BatchSaveReqVO batchReqVO) {
-        validateStoreExists(batchReqVO.getStoreId());
+        // 批量生成同样收口到登录门店，不采信入参
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateStoreExists(storeId);
         List<TableDO> tables = new ArrayList<>();
         String prefix = batchReqVO.getPrefix() == null ? "" : batchReqVO.getPrefix();
         for (int no = batchReqVO.getStartNo(); no <= batchReqVO.getEndNo(); no++) {
             String tableNo = prefix + no;
-            TableDO existing = tableMapper.selectOne(TableDO::getStoreId, batchReqVO.getStoreId(),
+            TableDO existing = tableMapper.selectOne(TableDO::getStoreId, storeId,
                     TableDO::getTableNo, tableNo);
             if (existing != null) {
                 continue; // 跳过已存在的桌号，避免重复
             }
             tables.add(new TableDO()
-                    .setStoreId(batchReqVO.getStoreId())
+                    .setStoreId(storeId)
                     .setTableNo(tableNo)
                     .setCategory(batchReqVO.getCategory())
                     .setSeats(batchReqVO.getSeats())
@@ -122,7 +132,8 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public String regenerateQrcode(Long id, String baseUrl) {
-        TableDO table = validateTableExists(id);
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        TableDO table = validateTableInStore(id, storeId);
         String content = buildQrcodeContent(table.getStoreId(), table.getId(), baseUrl);
         table.setQrcodeContent(content);
         tableMapper.updateById(table);
@@ -148,6 +159,19 @@ public class TableServiceImpl implements TableService {
         TableDO table = tableMapper.selectById(id);
         if (table == null) {
             throw new ServiceException(ErrorCodeConstants.TABLE_NOT_EXISTS);
+        }
+        return table;
+    }
+
+    /**
+     * 校验桌台归属：桌台必须存在，且属于当前登录账号绑定的门店。
+     * <p>
+     * 2026-09-28 实测补充：桌台此前只校验"存在性"，A 店店员可删/改/刷 B 店桌台。
+     */
+    private TableDO validateTableInStore(Long id, Long storeId) {
+        TableDO table = validateTableExists(id);
+        if (!Objects.equals(table.getStoreId(), storeId)) {
+            throw new ServiceException(ErrorCodeConstants.STORE_STAFF_STORE_MISMATCH);
         }
         return table;
     }
