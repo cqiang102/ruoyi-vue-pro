@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.restaurant.dal.mysql.order.OrderMapper;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.reserve.ReserveRuleMapper;
 import cn.iocoder.yudao.module.restaurant.enums.order.OrderStatusEnum;
 import cn.iocoder.yudao.module.restaurant.enums.order.OrderTypeEnum;
+import cn.iocoder.yudao.module.restaurant.service.store.StoreAuthService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,9 +20,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.RESERVE_RULE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.STORE_STAFF_STORE_MISMATCH;
 
 /**
  * 预约规则 Service 实现（M-09）
@@ -39,6 +42,9 @@ public class ReserveRuleServiceImpl implements ReserveRuleService {
     @Resource
     private OrderMapper orderMapper;
 
+    @Resource
+    private StoreAuthService storeAuthService;
+
     // ===================== 商户端（admin） =====================
 
     @Override
@@ -47,20 +53,26 @@ public class ReserveRuleServiceImpl implements ReserveRuleService {
         if (rule.getStatus() == null) {
             rule.setStatus(0);
         }
+        // 门店端接口：门店归属取登录账号绑定的门店，不采信入参
+        rule.setStoreId(storeAuthService.getLoginUserStoreId());
         reserveRuleMapper.insert(rule);
         return rule.getId();
     }
 
     @Override
     public void updateRule(ReserveRuleSaveReqVO reqVO) {
-        validateExists(reqVO.getId());
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateInStore(reqVO.getId(), storeId);
         ReserveRuleDO updateObj = BeanUtils.toBean(reqVO, ReserveRuleDO.class);
+        // 不允许通过更新把预约规则搬到其他门店
+        updateObj.setStoreId(storeId);
         reserveRuleMapper.updateById(updateObj);
     }
 
     @Override
     public void deleteRule(Long id) {
-        validateExists(id);
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateInStore(id, storeId);
         reserveRuleMapper.deleteById(id);
     }
 
@@ -155,6 +167,20 @@ public class ReserveRuleServiceImpl implements ReserveRuleService {
     private void validateExists(Long id) {
         if (id == null || reserveRuleMapper.selectById(id) == null) {
             throw exception(RESERVE_RULE_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 门店归属校验（2026-09-28 横向越权排查补充）：
+     * 原先只校验"存在性"，A 店店员可删/改 B 店的预约规则。
+     */
+    private void validateInStore(Long id, Long storeId) {
+        ReserveRuleDO rule = id == null ? null : reserveRuleMapper.selectById(id);
+        if (rule == null) {
+            throw exception(RESERVE_RULE_NOT_EXISTS);
+        }
+        if (!Objects.equals(rule.getStoreId(), storeId)) {
+            throw exception(STORE_STAFF_STORE_MISMATCH);
         }
     }
 

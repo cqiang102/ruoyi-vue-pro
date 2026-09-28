@@ -7,14 +7,17 @@ import cn.iocoder.yudao.module.restaurant.dal.dataobject.withdraw.WithdrawAccoun
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.withdraw.WithdrawDO;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.withdraw.WithdrawAccountMapper;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.withdraw.WithdrawMapper;
+import cn.iocoder.yudao.module.restaurant.service.store.StoreAuthService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.STORE_STAFF_STORE_MISMATCH;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.WITHDRAW_ACCOUNT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.WITHDRAW_AMOUNT_INVALID;
 import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.WITHDRAW_STATUS_INVALID;
@@ -36,6 +39,9 @@ public class WithdrawService {
     @Resource
     private WithdrawMapper withdrawMapper;
 
+    @Resource
+    private StoreAuthService storeAuthService;
+
     // ===================== 提现账户 =====================
 
     public Long createAccount(WithdrawVO.AccountSaveReqVO reqVO) {
@@ -43,17 +49,24 @@ public class WithdrawService {
         if (account.getStatus() == null) {
             account.setStatus(0);
         }
+        // 门店端接口：门店归属取登录账号绑定的门店，不采信入参
+        account.setStoreId(storeAuthService.getLoginUserStoreId());
         withdrawAccountMapper.insert(account);
         return account.getId();
     }
 
     public void updateAccount(WithdrawVO.AccountSaveReqVO reqVO) {
-        validateAccountExists(reqVO.getId());
-        withdrawAccountMapper.updateById(BeanUtils.toBean(reqVO, WithdrawAccountDO.class));
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateAccountInStore(reqVO.getId(), storeId);
+        WithdrawAccountDO updateObj = BeanUtils.toBean(reqVO, WithdrawAccountDO.class);
+        // 不允许通过更新把提现账户挂到其他门店
+        updateObj.setStoreId(storeId);
+        withdrawAccountMapper.updateById(updateObj);
     }
 
     public void deleteAccount(Long id) {
-        validateAccountExists(id);
+        Long storeId = storeAuthService.getLoginUserStoreId();
+        validateAccountInStore(id, storeId);
         withdrawAccountMapper.deleteById(id);
     }
 
@@ -140,6 +153,20 @@ public class WithdrawService {
     private void validateAccountExists(Long id) {
         if (id == null || withdrawAccountMapper.selectById(id) == null) {
             throw exception(WITHDRAW_ACCOUNT_NOT_EXISTS);
+        }
+    }
+
+    /**
+     * 门店归属校验（2026-09-28 横向越权排查补充）：
+     * 原先只校验"存在性"，A 店店员可删/改 B 店的提现账户（提现账户是打款凭据，风险高）。
+     */
+    private void validateAccountInStore(Long id, Long storeId) {
+        WithdrawAccountDO account = id == null ? null : withdrawAccountMapper.selectById(id);
+        if (account == null) {
+            throw exception(WITHDRAW_ACCOUNT_NOT_EXISTS);
+        }
+        if (!Objects.equals(account.getStoreId(), storeId)) {
+            throw exception(STORE_STAFF_STORE_MISMATCH);
         }
     }
 
