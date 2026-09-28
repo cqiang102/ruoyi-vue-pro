@@ -63,9 +63,17 @@ public class StoreOwnershipAspect {
         Parameter[] parameters = method.getParameters();
 
         // ① 覆盖入参 storeId
+        // 注意：一定要检查是否真的注入成功——注入失败却静默放行，会让人误以为"注解已保护"
         if (storeOwnership.injectStoreId()) {
+            boolean injected = false;
             for (Object arg : args) {
-                overrideStoreId(arg, storeId);
+                if (overrideStoreId(arg, storeId)) {
+                    injected = true;
+                }
+            }
+            if (!injected) {
+                log.warn("[storeOwnership][{} 标了 injectStoreId=true，但入参里没有任何带 setStoreId 的对象，注入未发生]"
+                        + " 注解配置可能有误，请核对", method.getName());
             }
         }
 
@@ -73,7 +81,11 @@ public class StoreOwnershipAspect {
         String idParam = storeOwnership.idParam();
         if (StringUtils.hasText(idParam)) {
             Long targetId = resolveId(idParam, parameters, args);
-            if (targetId != null) {
+            if (targetId == null) {
+                // 同样不能静默跳过：解析不到就说明注解里的 idParam 与实际入参对不上
+                log.warn("[storeOwnership][{} 标了 idParam=\"{}\"，但无法从入参解析出对象编号，归属校验被跳过]"
+                        + " 注解配置可能有误，请核对", method.getName(), idParam);
+            } else {
                 validateOwnership(storeOwnership.entity(), targetId, storeId, method);
             }
         }
@@ -147,16 +159,20 @@ public class StoreOwnershipAspect {
     }
 
     /**
-     * 把入参对象里的 storeId 覆盖为登录门店（对象没有 storeId 属性时静默跳过）
+     * 把入参对象里的 storeId 覆盖为登录门店
+     *
+     * @return 是否真的注入成功（对象没有 storeId 属性时返回 false，由调用方决定是否告警）
      */
-    private void overrideStoreId(Object arg, Long storeId) {
+    private boolean overrideStoreId(Object arg, Long storeId) {
         if (arg == null || arg instanceof Number || arg instanceof CharSequence) {
-            return;
+            return false;
         }
         try {
             arg.getClass().getMethod("setStoreId", Long.class).invoke(arg, storeId);
+            return true;
         } catch (Exception ignore) {
-            // 入参没有 storeId（例如只是 id 参数），跳过
+            // 该入参没有 storeId 属性（例如只是个 id 参数），跳过
+            return false;
         }
     }
 
