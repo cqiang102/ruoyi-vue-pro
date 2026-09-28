@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.decor.HomeDecorDO;
 import cn.iocoder.yudao.module.restaurant.dal.mysql.decor.HomeDecorMapper;
-import cn.iocoder.yudao.module.restaurant.service.store.StoreAuthService;
+import cn.iocoder.yudao.module.restaurant.framework.storeownership.StoreOwnership;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,12 +19,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.HOME_DECOR_NOT_EXISTS;
-import static cn.iocoder.yudao.module.restaurant.enums.ErrorCodeConstants.STORE_STAFF_STORE_MISMATCH;
 
 /**
  * 管理后台 - 首页装修（M-02）
@@ -41,9 +37,6 @@ public class HomeDecorController {
 
     @Resource
     private HomeDecorMapper homeDecorMapper;
-
-    @Resource
-    private StoreAuthService storeAuthService;
 
     @Data
     public static class SaveReqVO {
@@ -84,6 +77,7 @@ public class HomeDecorController {
     @PostMapping("/create")
     @Operation(summary = "新增装修条目")
     @PreAuthorize("@ss.hasAnyPermissions('restaurant:home-decor:create')")
+    @StoreOwnership(entity = HomeDecorDO.class, idParam = "", injectStoreId = true)
     public CommonResult<Long> createDecor(@Valid @RequestBody SaveReqVO reqVO) {
         HomeDecorDO decor = BeanUtils.toBean(reqVO, HomeDecorDO.class);
         if (decor.getStatus() == null) {
@@ -92,8 +86,7 @@ public class HomeDecorController {
         if (decor.getSort() == null) {
             decor.setSort(0);
         }
-        // 门店端接口：门店归属取登录账号绑定的门店，不采信入参
-        decor.setStoreId(storeAuthService.getLoginUserStoreId());
+        // storeId 由 @StoreOwnership 统一注入（不采信入参）
         homeDecorMapper.insert(decor);
         return success(decor.getId());
     }
@@ -101,13 +94,10 @@ public class HomeDecorController {
     @PutMapping("/update")
     @Operation(summary = "更新装修条目")
     @PreAuthorize("@ss.hasAnyPermissions('restaurant:home-decor:update')")
+    @StoreOwnership(entity = HomeDecorDO.class, idParam = "id", injectStoreId = true)
     public CommonResult<Boolean> updateDecor(@Valid @RequestBody SaveReqVO reqVO) {
-        Long storeId = storeAuthService.getLoginUserStoreId();
-        validateInStore(reqVO.getId(), storeId);
-        HomeDecorDO updateObj = BeanUtils.toBean(reqVO, HomeDecorDO.class);
-        // 不允许通过更新把装修条目搬到其他门店
-        updateObj.setStoreId(storeId);
-        homeDecorMapper.updateById(updateObj);
+        // 归属校验 + storeId 覆写由 @StoreOwnership 统一处理
+        homeDecorMapper.updateById(BeanUtils.toBean(reqVO, HomeDecorDO.class));
         return success(true);
     }
 
@@ -115,9 +105,8 @@ public class HomeDecorController {
     @Operation(summary = "删除装修条目")
     @Parameter(name = "id", required = true)
     @PreAuthorize("@ss.hasAnyPermissions('restaurant:home-decor:delete')")
+    @StoreOwnership(entity = HomeDecorDO.class, idParam = "id")
     public CommonResult<Boolean> deleteDecor(@RequestParam("id") Long id) {
-        Long storeId = storeAuthService.getLoginUserStoreId();
-        validateInStore(id, storeId);
         homeDecorMapper.deleteById(id);
         return success(true);
     }
@@ -134,18 +123,8 @@ public class HomeDecorController {
     }
 
     /**
-     * 门店归属校验（2026-09-28 横向越权排查补充）：
-     * 原先只校验"存在性"，A 店店员可删/改 B 店的首页装修条目。
-     * （本域没有 Service 层，Controller 直接操作 Mapper，故校验放在这里）
+     * 门店归属校验已迁移到 {@link StoreOwnership} 注解 + {@code StoreOwnershipAspect} 切面统一处理
+     * （2026-09-28：原先逐域手写，容易漏；本域作为切面托管的样板，其余域逐步迁移）。
      */
-    private void validateInStore(Long id, Long storeId) {
-        HomeDecorDO decor = id == null ? null : homeDecorMapper.selectById(id);
-        if (decor == null) {
-            throw exception(HOME_DECOR_NOT_EXISTS);
-        }
-        if (!Objects.equals(decor.getStoreId(), storeId)) {
-            throw exception(STORE_STAFF_STORE_MISMATCH);
-        }
-    }
 
 }
