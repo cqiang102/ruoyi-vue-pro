@@ -52,4 +52,49 @@ public class CouponVO {
         private LocalDateTime usedTime;
     }
 
+
+    @Schema(description = "可领取的券模板（领券中心）")
+    @Data
+    public static class TemplateRespVO {
+
+        private Long id;
+        /**
+         * 券名称
+         */
+        private String name;
+        /**
+         * 券类型：1-满减 2-折扣
+         */
+        private Integer type;
+        /**
+         * 使用门槛金额（分），0 表示无门槛
+         */
+        private Integer thresholdAmount;
+        /**
+         * 优惠值：满减=减免金额(分)；折扣=折扣率
+         */
+        private Integer discountValue;
+        /**
+         * 领取后有效天数
+         */
+        private Integer validDays;
+        /**
+         * 每人限领张数（0 或 null 表示不限）
+         */
+        private Integer perLimit;
+        /**
+         * 剩余可领张数；null 表示不限量
+         */
+        private Integer stockLeft;
+        /**
+         * 我已领取张数
+         */
+        private Integer claimedCount;
+        /**
+         * 当前是否可领（库存与每人限领均满足）
+         */
+        private Boolean canClaim;
+    }
+
+
 }

@@ -61,4 +61,11 @@ public interface CouponService {
      */
     List<CouponVO.RespVO> getMyCoupons(Long userId, Integer status);
 
+    /**
+     * 领券中心：可领取的券模板列表（仅启用中，并排除库存已领完 / 已达每人限领的模板）
+     *
+     * @param userId 用户编号（用于计算"我已领张数"与是否可领）
+     */
+    List<CouponVO.TemplateRespVO> getAvailableTemplates(Long userId);
+
 }

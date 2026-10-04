@@ -264,4 +264,48 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
         return getBaseMapper();
     }
 
+
+    @Override
+    public List<CouponVO.TemplateRespVO> getAvailableTemplates(Long userId) {
+        // 1. 仅取启用中的模板
+        List<CouponTemplateDO> templates = couponTemplateMapper.selectList(
+                new LambdaQueryWrapperX<CouponTemplateDO>().eq(CouponTemplateDO::getStatus, 1));
+        if (templates.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // 2. 一次批量取「我在这些模板下的已领张数」（含已使用/已过期，用于每人限领判断）
+        List<Long> templateIds = new ArrayList<>(templates.size());
+        for (CouponTemplateDO tpl : templates) {
+            templateIds.add(tpl.getId());
+        }
+        List<CouponDO> mine = couponMapper().selectList(new LambdaQueryWrapperX<CouponDO>()
+                .eq(CouponDO::getUserId, userId)
+                .in(CouponDO::getTemplateId, templateIds));
+        Map<Long, Long> claimedMap = mine.stream()
+                .collect(Collectors.groupingBy(CouponDO::getTemplateId, Collectors.counting()));
+        // 3. 组装（库存与限领都不满足时 canClaim=false，前端据此置灰）
+        List<CouponVO.TemplateRespVO> list = new ArrayList<>(templates.size());
+        for (CouponTemplateDO tpl : templates) {
+            CouponVO.TemplateRespVO vo = new CouponVO.TemplateRespVO();
+            vo.setId(tpl.getId());
+            vo.setName(tpl.getName());
+            vo.setType(tpl.getType());
+            vo.setThresholdAmount(tpl.getThresholdAmount());
+            vo.setDiscountValue(tpl.getDiscountValue());
+            vo.setValidDays(tpl.getValidDays());
+            vo.setPerLimit(tpl.getPerLimit());
+            Integer total = tpl.getTotal();
+            int taken = tpl.getTakenCount() == null ? 0 : tpl.getTakenCount();
+            vo.setStockLeft(total == null ? null : Math.max(total - taken, 0));
+            int claimed = claimedMap.getOrDefault(tpl.getId(), 0L).intValue();
+            vo.setClaimedCount(claimed);
+            boolean stockOk = total == null || taken < total;
+            boolean limitOk = tpl.getPerLimit() == null || tpl.getPerLimit() <= 0 || claimed < tpl.getPerLimit();
+            vo.setCanClaim(stockOk && limitOk);
+            list.add(vo);
+        }
+        return list;
+    }
+
+
 }

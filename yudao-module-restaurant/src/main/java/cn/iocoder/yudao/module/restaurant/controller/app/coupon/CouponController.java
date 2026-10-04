@@ -32,6 +32,13 @@ public class CouponController {
         return success(couponService.claimCoupon(userId, templateId));
     }
 
+    @GetMapping("/available-list")
+    @Operation(summary = "领券中心：可领取的券模板列表")
+    public CommonResult<List<CouponVO.TemplateRespVO>> availableList() {
+        Long userId = SecurityFrameworkUtils.getLoginUserId();
+        return success(couponService.getAvailableTemplates(userId));
+    }
+
     @GetMapping("/my-list")
     @Operation(summary = "我的优惠券列表")
     public CommonResult<List<CouponVO.RespVO>> myList(@RequestParam(value = "status", required = false) Integer status) {
