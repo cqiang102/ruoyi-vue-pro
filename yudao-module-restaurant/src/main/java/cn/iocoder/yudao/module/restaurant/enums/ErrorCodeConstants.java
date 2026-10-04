@@ -180,4 +180,9 @@ public interface ErrorCodeConstants {
     ErrorCode INVOICE_TAX_NO_REQUIRED = new ErrorCode(2_000_026_005, "企业抬头必须填写税号");
     ErrorCode INVOICE_REJECT_REASON_REQUIRED = new ErrorCode(2_000_026_006, "驳回时必须填写原因");
 
+
+    // ========== 工单（P-07 平台消息·工单） ==========
+    ErrorCode TICKET_NOT_EXISTS = new ErrorCode(2_000_027_000, "工单不存在");
+    ErrorCode TICKET_STATUS_INVALID = new ErrorCode(2_000_027_001, "工单已关闭，不允许回复");
+
 }
