@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.restaurant.dal.dataobject.dish.DishAddonDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.dish.DishDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.dish.DishSpecDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderDO;
+import cn.iocoder.yudao.module.restaurant.dal.dataobject.delivery.DeliveryOrderDO;
+import cn.iocoder.yudao.module.restaurant.dal.mysql.delivery.DeliveryOrderMapper;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.order.OrderItemDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.store.StoreDO;
 import cn.iocoder.yudao.module.restaurant.dal.dataobject.store.TableDO;
@@ -90,6 +92,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
     @Resource
     private OrderItemMapper orderItemMapper;
+    @Resource
+    private DeliveryOrderMapper deliveryOrderMapper;
     @Resource
     private DishMapper dishMapper;
     @Resource
@@ -622,6 +626,20 @@ public class OrderServiceImpl implements OrderService {
         OrderVO.RespVO respVO = OrderConvert.convert(order);
         respVO.setItems(OrderConvert.convertItemList(
                 orderItemMapper.selectList(OrderItemDO::getOrderId, id)));
+        // 2026-10-05（C-13 A）：外卖单附加配送单信息（骑手/状态/达达单号），
+        // 未呼叫达达时 deliveryOrder 为 null，前端据此隐藏配送区块。
+        if (order.getType() != null && order.getType() == 3) {
+            DeliveryOrderDO delivery = deliveryOrderMapper.selectByOrderId(id);
+            if (delivery != null) {
+                OrderVO.DeliveryInfoVO info = new OrderVO.DeliveryInfoVO();
+                info.setDadaOrderId(delivery.getDadaOrderId());
+                info.setStatus(delivery.getStatus());
+                info.setDmName(delivery.getDmName());
+                info.setDmMobile(delivery.getDmMobile());
+                info.setFee(delivery.getFee());
+                respVO.setDeliveryOrder(info);
+            }
+        }
         return respVO;
     }
 

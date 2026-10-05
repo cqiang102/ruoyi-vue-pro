@@ -228,6 +228,11 @@ public class OrderVO {
         @Schema(description = "叫号时间")
         private LocalDateTime calledTime;
 
+        /**
+         * 配送单信息（仅外卖单 type=3 且已呼叫达达时返回；未呼叫为 null，前端据此隐藏配送区块）
+         */
+        private DeliveryInfoVO deliveryOrder;
+
         @Schema(description = "支付时间")
         private LocalDateTime paidTime;
 
@@ -241,5 +246,33 @@ public class OrderVO {
         private List<ItemRespVO> items;
 
     }
+
+
+    @Schema(description = "配送单信息（外卖单 type=3）")
+    @Data
+    public static class DeliveryInfoVO {
+
+        /**
+         * 达达配送单号（供用户复制或跳转第三方查询）
+         */
+        private String dadaOrderId;
+        /**
+         * 配送状态（本地映射）：0待发单 1待接单 2待取货 3配送中 4已完成 5已取消 8追加待接单 9返回中
+         */
+        private Integer status;
+        /**
+         * 骑手姓名
+         */
+        private String dmName;
+        /**
+         * 骑手电话
+         */
+        private String dmMobile;
+        /**
+         * 配送费（元）
+         */
+        private java.math.BigDecimal fee;
+    }
+
 
 }
