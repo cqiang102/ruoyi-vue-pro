@@ -121,7 +121,13 @@ public class WithdrawController {
 
     @GetMapping("/workbench-summary")
     @Operation(summary = "工作台收支概览（S-04：storeId 由登录店员绑定门店强制注入）")
-    @PreAuthorize("@ss.hasAnyPermissions('restaurant:withdraw:query')")
+    // 2026-10-05 修复：原用 restaurant:withdraw:query，与「平台端财务管理」同权限串。
+    // m49 为把财务管理收归平台端而剔除了门店角色的该权限 → 门店端工作台的收支卡片
+    // 悄悄不显示了（前端 if(res.code===0) 静默失败）。但直接把权限还回去**不安全**：
+    // 同 Controller 的 /income-summary、/page 都是**前端传 storeId、无归属校验**，
+    // 门店账号拿到该权限可跨店查账。故本接口改用**独立权限串**（内部走
+    // storeAuthService.getLoginUserStoreId()，无越权面），只放行这一个接口。
+    @PreAuthorize("@ss.hasAnyPermissions('restaurant:withdraw:workbench')")
     public CommonResult<Map<String, Object>> getWorkbenchSummary() {
         Long storeId = storeAuthService.getLoginUserStoreId();
         return success(withdrawService.getIncomeSummary(storeId, statisticsMapper));
